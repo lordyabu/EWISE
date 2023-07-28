@@ -55,7 +55,7 @@ def get_papers_link(url,html_list,wait_time):
 
 
 # 2 - Get Abstract for a specific paper
-def get_abstract(url_paper_list,paper_number,wait_time):
+def get_abstract_info(url_paper_list,paper_number,wait_time,title_id,author_id,abstract_id,issue_vol_id):
     """
     This function retrieves the abstract, title, authors, and issue/volume 
     information of a specific academic paper from a given list of URLs. 
@@ -67,6 +67,14 @@ def get_abstract(url_paper_list,paper_number,wait_time):
         
         paper_number (int): The index of the paper in url_paper_list from 
         which to retrieve the details.
+        
+        title_id (str): string with HTML id to paper's title.
+        
+        author_id (str): string with HTML id to paper's author.
+        
+        abstract_id (str): string with HTML id to paper's abstract.
+        
+        issue_vol_id (str): string with HTML id to paper's volume and issue.
         
         wait_time (float): The time to wait (in seconds) after loading 
         the webpage, allowing dynamic content to render before 
@@ -81,12 +89,12 @@ def get_abstract(url_paper_list,paper_number,wait_time):
     """
     try:
         browser = webdriver.Firefox()
-        browser.get(html_list[paper_number])
+        browser.get(url_paper_list[paper_number])
         time.sleep(wait_time)
-        abstract = browser.find_element(By.ID, 'preview-section-abstract').text
-        title = browser.find_element(By.ID, 'screen-reader-main-title').text
-        authors = browser.find_element(By.ID, 'author-group').text
-        issue_volume = browser.find_element(By.ID, 'publication').text
+        abstract = browser.find_element(By.ID, abstract_id).text
+        title = browser.find_element(By.ID, title_id).text
+        authors = browser.find_element(By.ID, author_id).text
+        issue_volume = browser.find_element(By.ID, issue_vol_id).text
         paper = [issue_volume,[title,authors,abstract]]
     except: paper = []
     browser.close()
