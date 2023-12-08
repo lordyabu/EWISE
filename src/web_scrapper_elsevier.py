@@ -48,6 +48,7 @@ def get_papers_link(url,html_list,wait_time):
     browser.get(url)
     time.sleep(wait_time) 
     links = browser.find_elements(By.XPATH, "//h3/a")
+    print(f"{len(links)} Links Found")
     for i in links:
         html_list.append(i.get_attribute('href'))
     browser.close()
