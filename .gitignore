@@ -1,3 +1,4 @@
-tests/fire_fox_testing.py
-tests/geckodriver.exe
-tests/geckodriver.log
+geckodriver.exe
+geckodriver.log
+src/explore_data
+data
