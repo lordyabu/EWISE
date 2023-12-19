@@ -2,3 +2,4 @@ geckodriver.exe
 geckodriver.log
 src/explore_data
 data
+chromedriver.exe
