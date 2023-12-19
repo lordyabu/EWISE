@@ -20,11 +20,42 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.common.by import By
 from config import GECKO_PATH
-
+import re
 
 # =============================================================================
 # Functions
 # =============================================================================
+
+
+
+def get_volume_and_issue_data_elsevier(journal_name):
+    service = Service(GECKO_PATH)
+    browser = webdriver.Firefox(service=service)
+    journal_url = f'https://www.sciencedirect.com/journal/{journal_name}/issues'
+    print(journal_url)
+    time.sleep(5)
+    browser.get(journal_url)
+
+    # Dictionary to store volume: [link]
+    volume_dict = {}
+
+    # Find all issue link elements
+    issue_link_elements = browser.find_elements(By.CLASS_NAME, "js-issue-item-link")
+    print(issue_link_elements)
+    for issue_link_element in issue_link_elements:
+        link = issue_link_element.get_attribute('href')
+        full_link = link if link.startswith('http') else 'https://www.sciencedirect.com' + link
+
+        volume_text = issue_link_element.text
+        volume_match = re.search(r"Volume (\d+)", volume_text)
+        if volume_match:
+            volume = volume_match.group(1)
+            if volume not in volume_dict:
+                volume_dict[volume] = []
+            volume_dict[volume].append(full_link)
+
+    browser.close()
+    return volume_dict
 
 # 1 - Get Url from different issues
 def get_papers_link_elsevier(url, html_list, wait_time):
