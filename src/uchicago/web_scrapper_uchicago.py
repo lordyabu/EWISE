@@ -1,15 +1,25 @@
 # -*- coding: utf-8 -*-
+
 """
-Web Scapper for Academic Journals - Elsevier Module
+Web Scraper for Academic Journals - University of Chicago Module
 
-This project provides a web scraping tool to extract data from academic
-journals, including article titles, authors, abstracts, and other details.
-It uses the Python programming language and the Selenium library,
-along with the Firefox web driver, to automate the process of accessing
-academic journal webpages and collecting relevant information.
+This module provides a web scraping tool to extract data from academic journals published by the University of Chicago.
+It uses Python, Selenium, and the Firefox web driver to automate the process of accessing academic journal webpages
+and collecting relevant information, including article titles, authors, abstracts, and other details. The tool is
+particularly designed to scrape data from the University of Chicago's journal webpages.
 
-Those packages are built to search Elsevier papers.
+Functions:
+    get_volume_and_issue_data_uchicago(journal_name): Retrieves volume and issue data for a specified University of Chicago journal.
+    get_papers_link_uchicago(url, html_list, wait_time): Scrapes URLs of papers listed on a journal's webpage.
+    get_abstract_info_uchicago(url_paper_list, paper_number, wait_time): Extracts abstract, title, authors,
+        and issue/volume information from a paper's webpage.
 
+Usage:
+    1. Collect paper URLs:
+        paper_urls = get_papers_link_uchicago(journal_url, [], wait_time)
+
+    2. Extract paper details:
+        paper_info = get_abstract_info_uchicago(paper_urls, paper_index, wait_time)
 """
 
 # =============================================================================
@@ -28,8 +38,17 @@ from selenium.webdriver.support import expected_conditions as EC
 # Functions
 # =============================================================================
 
-
+# Currently Not in use
 def get_volume_and_issue_data_uchicago(journal_name):
+    """
+    Retrieves volume and issue data from the specified University of Chicago journal URL.
+
+    Args:
+        journal_name (str): Name of the University of Chicago journal.
+
+    Returns:
+        volume_dict (dict): A dictionary mapping each volume to its issues and corresponding URLs.
+    """
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
     journal_url = f'https://www.journals.uchicago.edu/loi/{journal_name}'
@@ -69,29 +88,24 @@ def get_volume_and_issue_data_uchicago(journal_name):
     browser.close()
     return volume_dict
 
-# 1 - Get Url from different issues
+
 def get_papers_link_uchicago(url, html_list, wait_time):
     """
-    This function retrieves the URLs of papers listed on a webpage using
-    Selenium and the Firefox web driver.
+    Retrieves URLs of papers from a specified University of Chicago journal webpage.
 
     Args:
-        url (string): The URL of the webpage containing the list of papers.
-
-        html_list (list): A list to store the extracted paper URLs.
-
-        wait_time (TYPE): (float): The time to wait (in seconds) after loading
-        the webpage, allowing dynamic content to render before
-        extracting the links.
+        url (str): URL of the journal's webpage.
+        html_list (list): List to store the paper URLs.
+        wait_time (int): Time to wait for page rendering before scraping.
 
     Returns:
-        html_list (list): A list containing the URLs of papers extracted from the webpage.
-
+        html_list (list): Updated list with URLs of papers.
     """
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
     browser.get(url)
     time.sleep(wait_time)
+
     # Updated selector for DOI links
     links = browser.find_elements(By.CSS_SELECTOR, "div.issue-item h4.issue-item__title a")
     for link in links:
@@ -101,35 +115,27 @@ def get_papers_link_uchicago(url, html_list, wait_time):
     return html_list
 
 
-# 2 - Get Abstract for a specific paper
 def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time):
     """
-    Retrieves abstract, title, authors, and issue/volume information for an academic paper.
+    Retrieves detailed information of a specific paper from the University of Chicago.
 
     Args:
-        url_paper_list (list): URLs of academic papers.
-        paper_number (int): Index of the paper in url_paper_list.
-        wait_time (float): Time to wait for dynamic content to load.
+        url_paper_list (list): List of paper URLs.
+        paper_number (int): Index of the paper in the list.
+        wait_time (int): Time to wait for page rendering before scraping.
 
     Returns:
-        paper (list): [issue/volume, [title, authors, abstract]].
+        paper (list): A list containing detailed information of the paper.
     """
     try:
         service = Service(GECKO_PATH)
         browser = webdriver.Firefox(service=service)
         browser.get(url_paper_list[paper_number])
         time.sleep(wait_time)
-
-        print("here0")
         title = browser.find_element(By.CSS_SELECTOR, "h1.citation__title").text
-        print("here1")
         authors = ', '.join([author.text for author in browser.find_elements(By.CSS_SELECTOR, "a.author-name span")])
-        print("here2")
         abstract = browser.find_element(By.CSS_SELECTOR, "div.abstractSection.abstractInFull p").text
-        print("here3")
         issue_volume = browser.find_element(By.CSS_SELECTOR, ".current-issue__meta").text
-        print("here4")
-
         paper = [issue_volume, [title, authors, abstract, 'Metrics NA']]
     except Exception as e:
         paper = []

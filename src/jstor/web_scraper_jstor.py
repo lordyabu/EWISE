@@ -1,15 +1,34 @@
 # -*- coding: utf-8 -*-
+
+# Currently not in use ///////////////////////////////////
+
 """
-Web Scapper for Academic Journals - Elsevier Module
+Web Scraper for Academic Journals - JSTOR Module
 
-This project provides a web scraping tool to extract data from academic
-journals, including article titles, authors, abstracts, and other details.
-It uses the Python programming language and the Selenium library,
-along with the Firefox web driver, to automate the process of accessing
-academic journal webpages and collecting relevant information.
+This module provides a web scraping tool to extract data from academic journals available on JSTOR.
+It uses Python programming language and the Selenium library, along with Firefox and Chrome web drivers,
+to automate the process of accessing academic journal webpages and collecting relevant information like
+article titles, authors, abstracts, and other details. The tool is tailored for research purposes, enabling
+efficient data collection from JSTOR.
 
-Those packages are built to search Elsevier papers.
+Functions:
+    get_volume_and_issue_data_jstor(url): Retrieves volume and issue data from a specified JSTOR journal.
+    get_link_from_dict_jstor(volume_dict, volume_number, issue_number): Gets the link for a specific volume and issue from the volume dictionary.
+    get_papers_link_jstor(url, html_list, wait_time): Collects URLs of papers from a JSTOR journal's webpage.
+    get_abstract_info_jstor(url_paper_list, paper_number, wait_time): Extracts detailed information from a paper's webpage on JSTOR.
 
+Usage:
+    1. Retrieve volume and issue data:
+        volume_issue_data = get_volume_and_issue_data_jstor(journal_url)
+
+    2. Get a specific link for a volume and issue:
+        specific_link = get_link_from_dict_jstor(volume_issue_data, volume_number, issue_number)
+
+    3. Collect paper URLs:
+        paper_urls = get_papers_link_jstor(specific_link, [], wait_time)
+
+    4. Extract paper details:
+        paper_info = get_abstract_info_jstor(paper_urls, paper_index, wait_time)
 """
 
 # =============================================================================
@@ -26,12 +45,16 @@ from config import GECKO_PATH, CHROME_PATH
 # =============================================================================
 # Functions
 # =============================================================================
-
-
-
-
-
 def get_volume_and_issue_data_jstor(url):
+    """
+    Retrieves volume and issue data from the specified JSTOR journal URL.
+
+    Args:
+        url (str): URL of the JSTOR journal page to scrape.
+
+    Returns:
+        volume_dict (dict): A dictionary mapping each volume to its issues and corresponding URLs.
+    """
     service = ServiceFF(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
     base_url = "https://www.jstor.org"
@@ -72,6 +95,17 @@ def get_volume_and_issue_data_jstor(url):
 
 
 def get_link_from_dict_jstor(volume_dict, volume_number, issue_number):
+    """
+    Retrieves the link for a specific volume and issue from a volume dictionary.
+
+    Args:
+        volume_dict (dict): A dictionary containing volume and issue data.
+        volume_number (int): The volume number.
+        issue_number (int): The issue number within the volume.
+
+    Returns:
+        str: URL link for the specified volume and issue, or a message if not found.
+    """
     volume_key = f"Vol. {volume_number}"
     if volume_key in volume_dict:
         for issue in volume_dict[volume_key]:
@@ -79,21 +113,18 @@ def get_link_from_dict_jstor(volume_dict, volume_number, issue_number):
                 return issue[1]
     return "No link found for the specified volume and issue."
 
-# 1 - Get Url from different issues
+
 def get_papers_link_jstor(url, html_list, wait_time):
     """
-    This function retrieves the URLs of papers listed on a webpage using
-    Selenium and the Firefox web driver.
+    Retrieves URLs of papers from a specified JSTOR journal webpage.
 
     Args:
-        url (string): The URL of the webpage containing the list of papers.
-        html_list (list): A list to store the extracted paper URLs.
-        wait_time (float): The time to wait (in seconds) after loading
-                           the webpage, allowing dynamic content to render before
-                           extracting the links.
+        url (str): URL of the journal's webpage.
+        html_list (list): List to store the paper URLs.
+        wait_time (int): Time to wait for page rendering before scraping.
 
     Returns:
-        html_list (list): A list containing the URLs of papers extracted from the webpage.
+        html_list (list): Updated list with URLs of papers.
     """
     time.sleep(wait_time)
     service = ServiceC(CHROME_PATH)
@@ -113,31 +144,17 @@ def get_papers_link_jstor(url, html_list, wait_time):
     return html_list
 
 
-# 2 - Get Abstract for a specific paper
-
-
-# =============================================================================
-# =============================================================================
 def get_abstract_info_jstor(url_paper_list, paper_number, wait_time):
     """
-    This function retrieves the abstract, title, authors, and issue/volume
-    information of a specific academic paper from a given list of URLs.
-    It uses Selenium and the Firefox web driver to access the webpage
-    containing the paper's details.
+    Retrieves detailed information of a specific paper from JSTOR.
 
     Args:
-        url_paper_list (list): A list containing URLs of academic papers' pages.
-        paper_number (int): The index of the paper in url_paper_list from
-                            which to retrieve the details.
-        wait_time (float): The time to wait (in seconds) after loading
-                           the webpage, allowing dynamic content to render before
-                           extracting the details.
+        url_paper_list (list): List of paper URLs.
+        paper_number (int): Index of the paper in the list.
+        wait_time (int): Time to wait for page rendering before scraping.
 
     Returns:
-        paper (list): A list containing the issue/volume information as the
-                      first element and a sublist with title, authors, and abstract as
-                      the second element. If any exception occurs during scraping
-                      (e.g., invalid URL, element not found), an empty list is returned.
+        paper (list): A list containing detailed information of the paper.
     """
     try:
         time.sleep(wait_time)
@@ -145,28 +162,16 @@ def get_abstract_info_jstor(url_paper_list, paper_number, wait_time):
         browser = webdriver.Chrome(service=service)
         browser.get(url_paper_list[paper_number])
         time.sleep(wait_time)
-
-        # Extract title
-        print("here0")
         title = browser.find_element(By.CSS_SELECTOR,
                                      "mfe-turnaway-pharos-heading[data-pharos-component='PharosHeading']").text
-        print("here1", title)
-        # Extract authors
         authors = browser.find_element(By.CSS_SELECTOR, "p.content-meta-data__authors").text
-        print("here2", authors)
-        # Extract abstract
         abstract = browser.find_element(By.CSS_SELECTOR,
                                         "div.turnaway-preview-appendix__section--prominent p.turnaway-preview-appendix__section-paragraph").text
-        print("here3", abstract)
-        # Extract issue/volume information
         issue_volume = browser.find_element(By.CSS_SELECTOR,
                                             "mfe-turnaway-pharos-link[data-pharos-component='PharosLink']").text
-        print("here4", issue_volume)
-        paper = [issue_volume, [title, authors, abstract, "Metrics NA"]]
+        paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []
-
-
 
     browser.close()
     return paper

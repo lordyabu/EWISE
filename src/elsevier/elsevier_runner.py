@@ -1,3 +1,29 @@
+# -*- coding: utf-8 -*-
+
+# =============================================================================
+# Elsevier Journal Web Scraper
+# =============================================================================
+"""
+This module provides automated tools for scraping academic articles from
+Elsevier journals. It extracts details like article titles, authors, abstracts,
+and issue/volume information using Selenium with GeckoDriver for web scraping.
+The scraped data is saved in JSON format.
+
+Functions:
+    scrape_elsevier_journal(journal_name, volumes, issues): Main function to scrape
+        articles from a specified Elsevier journal.
+    scrape_multiple_elsevier_journals(journal_list, volumes, issues): Scrapes multiple
+        journals based on the given list of journal names.
+
+Usage:
+    To scrape a single journal:
+        scrape_elsevier_journal('journal-name', [volume_numbers], [issue_numbers])
+
+    To scrape multiple journals:
+        journal_list = ['journal1', 'journal2', ...]
+        scrape_multiple_elsevier_journals(journal_list, [volume_numbers], [issue_numbers])
+"""
+
 # =============================================================================
 # Packages
 # =============================================================================
@@ -14,37 +40,20 @@ sys.path.append(os.path.join(USER_PATH, 'src'))
 from src.elsevier.web_scrapper_elsevier import get_papers_link_elsevier, get_abstract_info_elsevier
 
 
-
 # =============================================================================
 # Scraper/Saver
 # =============================================================================
-def scrape_elsevier_journal(journal_name, volumes, issues, title_id, author_id, abstract_id, issue_vol_id, metric_id, keyword_id):
+def scrape_elsevier_journal(journal_name, volumes, issues):
     """
-    Scrapes information from Elsevier journal webpages and saves it in a JSON file.
-
-    This function automates the process of accessing Elsevier journal webpages to collect
-    detailed information about academic articles. It uses Selenium with GeckoDriver for
-    web scraping. The information collected includes article titles, authors, abstracts,
-    and issue/volume details. The progress of scraping is displayed using a progress bar.
+    Scrapes a specified Elsevier journal for academic articles.
 
     Args:
-        journal_name (str): The name of the journal to scrape. This name is used in the
-                            URL to access specific journal pages.
-        volumes (list of int): A list of volume numbers to scrape. Each volume number
-                               corresponds to a volume of the journal.
-        issues (list of int or None): A list of issue numbers to scrape within each volume.
-                                      If None or empty, all issues in the specified volumes
-                                      will be scraped.
-        title_id (str): The HTML element ID for locating the title of an article on the webpage.
-        author_id (str): The HTML element ID for locating the authors of an article.
-        abstract_id (str): The HTML element ID for locating the abstract of an article.
-        issue_vol_id (str): The HTML element ID for locating the issue and volume information
-                            of an article.
+        journal_name (str): The name of the journal.
+        volumes (list of int): Volumes to scrape.
+        issues (list of int): Issues to scrape within each volume.
 
     Returns:
-        None: The function does not return any value. Instead, it writes the scraped data to
-              a JSON file named 'elsevier_{journal_name}.json' in the directory specified by the global
-              variable DATA_PATH.
+        None: Saves the scraped data as a JSON file.
     """
 
     output_path = os.path.join(DATA_PATH, f'elsevier_{journal_name}.json')
@@ -75,12 +84,12 @@ def scrape_elsevier_journal(journal_name, volumes, issues, title_id, author_id, 
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
-            abstract = get_abstract_info_elsevier(url_paper_list=html_list, paper_number=i, wait_time=3, title_id=title_id,
-                                         author_id=author_id, abstract_id=abstract_id, issue_vol_id=issue_vol_id)
+            abstract = get_abstract_info_elsevier(url_paper_list=html_list, paper_number=i, wait_time=3)
             if abstract:
                 abstract_list.append(abstract)
         except Exception as e:
             pass
+
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
@@ -89,28 +98,39 @@ def scrape_elsevier_journal(journal_name, volumes, issues, title_id, author_id, 
 # =============================================================================
 # Run Multiple
 # =============================================================================
-def scrape_multiple_elsevier_journals(journal_list, volumes, issues, title_id, author_id, abstract_id, issue_vol_id, metric_id, keyword_id):
+def scrape_multiple_elsevier_journals(journal_list, volumes, issues):
+    """
+    Scrapes multiple Elsevier journals for academic articles.
+
+    Args:
+        journal_list (list of str): List of journal names to scrape.
+        volumes (list of int): Volumes to scrape in each journal.
+        issues (list of int): Issues to scrape within each volume.
+
+    Returns:
+        None: Saves the scraped data as JSON files for each journal.
+    """
     for journal_name in journal_list:
         print(f"Starting {journal_name}")
-        scrape_elsevier_journal(journal_name, volumes, issues, title_id, author_id, abstract_id, issue_vol_id, metric_id, keyword_id)
+        scrape_elsevier_journal(journal_name, volumes, issues)
 
 
 # =============================================================================
 # Main
 # =============================================================================
 def main():
-    journal_list = ["journal-of-empirical-finance", 'journal-of-economic-behavior-and-organization', 'journal-of-economic-dynamics-and-control', 'journal-of-economic-theory', 'journal-of-environmental-economics-and-management', 'journal-of-health-economics', 'journal-of-international-economics', 'journal-of-international-money-and-finance', 'journal-of-mathematical-economics', 'journal-of-monetary-economics', 'journal-of-public-economics', 'journal-of-econometrics', 'journal-of-development-economics', 'asia-and-the-global-economy', 'journal-of-accounting-and-economics', 'journal-of-financial-markets', 'journal-of-macroeconomics', 'journal-of-economics-and-business', 'journal-of-financial-economics', 'economic-modelling']
-    volumes = [60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70]
+    journal_list = ["journal-of-empirical-finance", 'journal-of-economic-behavior-and-organization',
+                    'journal-of-economic-dynamics-and-control', 'journal-of-economic-theory',
+                    'journal-of-environmental-economics-and-management', 'journal-of-health-economics',
+                    'journal-of-international-economics', 'journal-of-international-money-and-finance',
+                    'journal-of-mathematical-economics', 'journal-of-monetary-economics', 'journal-of-public-economics',
+                    'journal-of-econometrics', 'journal-of-development-economics', 'asia-and-the-global-economy',
+                    'journal-of-accounting-and-economics', 'journal-of-financial-markets', 'journal-of-macroeconomics',
+                    'journal-of-economics-and-business', 'journal-of-financial-economics', 'economic-modelling']
+    volumes = [70]
     issues = [0]
-    title_id = 'screen-reader-main-title'
-    author_id = 'author-group'
-    abstract_id = 'abstracts'
-    issue_vol_id = 'publication-title'
-    metric_id = 'metrics-header'
-    keyword_id = 'keys0001'
 
-    scrape_multiple_elsevier_journals(journal_list=journal_list, volumes=volumes, issues=issues, title_id=title_id,
-                            author_id=author_id, abstract_id=abstract_id, issue_vol_id=issue_vol_id, metric_id=metric_id, keyword_id=keyword_id)
+    scrape_multiple_elsevier_journals(journal_list=journal_list, volumes=volumes, issues=issues)
 
 
 if __name__ == "__main__":

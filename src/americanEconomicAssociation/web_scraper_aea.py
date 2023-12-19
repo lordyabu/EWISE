@@ -1,24 +1,34 @@
 # -*- coding: utf-8 -*-
 """
-Web Scapper for Academic Journals - Elsevier Module
+Web Scraper for Academic Journals - Elsevier Module
 
-This project provides a web scraping tool to extract data from academic
-journals, including article titles, authors, abstracts, and other details.
-It uses the Python programming language and the Selenium library,
-along with the Firefox web driver, to automate the process of accessing
-academic journal webpages and collecting relevant information.
+This module provides a web scraping tool to extract data from academic journals published by Elsevier.
+It automates the process of accessing journal webpages and collecting information like article titles,
+authors, abstracts, and issue/volume details. The tool uses Python, Selenium, and BeautifulSoup along
+with the Firefox web driver for scraping. The extracted data is collected in a structured format.
 
-Those packages are built to search Elsevier papers.
+Functions:
+    get_volume_and_issue_data_aea(url): Retrieves volume and issue data for a specified journal.
+    get_papers_link_aea(url, html_list, wait_time): Collects paper URLs from a journal's webpage.
+    get_abstract_info_aea(url_paper_list, paper_number, wait_time): Extracts abstract, title, authors,
+        and issue/volume information from a paper's webpage.
 
+Usage:
+    1. Retrieve volume and issue data:
+        volume_issue_data = get_volume_and_issue_data_aea(journal_url)
+
+    2. Collect paper URLs:
+        paper_urls = get_papers_link_aea(journal_url, [], wait_time)
+
+    3. Extract paper details:
+        paper_info = get_abstract_info_aea(paper_urls, paper_index, wait_time)
 """
 
 # =============================================================================
 # Packages
 # =============================================================================
-import warnings
 import time
 from selenium import webdriver
-from bs4 import BeautifulSoup
 from selenium.webdriver.firefox.service import Service
 from config import GECKO_PATH
 from selenium.webdriver.common.by import By
@@ -29,10 +39,16 @@ from selenium.webdriver.support import expected_conditions as EC
 # =============================================================================
 # Functions
 # =============================================================================
-
-
-
 def get_volume_and_issue_data_aea(url):
+    """
+    Retrieves volume and issue data from the specified AEA journal URL.
+
+    Args:
+        url (str): URL of the AEA journal page to scrape.
+
+    Returns:
+        volume_dict (dict): A dictionary mapping each volume to its issues and corresponding URLs.
+    """
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
     base_url = "https://www.aeaweb.org"
@@ -51,7 +67,7 @@ def get_volume_and_issue_data_aea(url):
         issue_elements = volume_element.find_elements(By.CLASS_NAME, "issue-item")
 
         issue_list = []
-        issue_num = 4  # Start with the highest issue number
+        issue_num = 4  # Start with the highest issue number (All journals follow 4, 3, 2, 1) pattern
         for issue in issue_elements:
             issue_link_element = issue.find_element(By.TAG_NAME, "a")
             link = issue_link_element.get_attribute('href')
@@ -64,21 +80,18 @@ def get_volume_and_issue_data_aea(url):
     browser.close()
     return volume_dict
 
-# 1 - Get Url from different issues
+
 def get_papers_link_aea(url, html_list, wait_time):
     """
-    This function retrieves the URLs of papers listed on a webpage using
-    Selenium and the Firefox web driver.
+    Retrieves the URLs of papers listed on a specified webpage.
 
     Args:
-        url (string): The URL of the webpage containing the list of papers.
-        html_list (list): A list to store the extracted paper URLs.
-        wait_time (float): The time to wait (in seconds) after loading
-                           the webpage, allowing dynamic content to render before
-                           extracting the links.
+        url (str): The URL of the webpage to scrape.
+        html_list (list): A list to store the retrieved paper URLs.
+        wait_time (int): Wait time in seconds before scraping.
 
     Returns:
-        html_list (list): A list containing the URLs of papers extracted from the webpage.
+        html_list (list): Updated list with URLs of papers.
     """
     time.sleep(wait_time)
     service = Service(GECKO_PATH)
@@ -95,47 +108,30 @@ def get_papers_link_aea(url, html_list, wait_time):
     return html_list
 
 
-# 2 - Get Abstract for a specific paper
-
-
-# =============================================================================
-# =============================================================================
 def get_abstract_info_aea(url_paper_list, paper_number, wait_time):
     """
-    This function retrieves the abstract, title, authors, and issue/volume
-    information of a specific academic paper from a given list of URLs.
-    It uses Selenium and the Firefox web driver to access the webpage
-    containing the paper's details.
+    Retrieves the abstract, title, authors, and issue/volume information of a paper.
 
     Args:
-        url_paper_list (list): A list containing URLs of academic papers' pages.
-        paper_number (int): The index of the paper in url_paper_list from
-                            which to retrieve the details.
-        wait_time (float): The time to wait (in seconds) after loading
-                           the webpage, allowing dynamic content to render before
-                           extracting the information.
+        url_paper_list (list): List of URLs to academic papers.
+        paper_number (int): Index of the paper in url_paper_list to scrape.
+        wait_time (int): Wait time in seconds before scraping.
 
     Returns:
-        paper (list): A list containing the issue/volume information as the
-                      first element and a sublist with title, authors, and abstract as
-                      the second element. If any exception occurs during scraping
-                      (e.g., invalid URL, element not found), an empty list is returned.
-
+        paper (list): A list containing paper details or an empty list in case of an error.
     """
+
     try:
         time.sleep(wait_time)
         service = Service(GECKO_PATH)
         browser = webdriver.Firefox(service=service)
         browser.get(url_paper_list[paper_number])
         time.sleep(wait_time)
-
-        # Extract the abstract, title, and authors
         abstract = browser.find_element(By.CSS_SELECTOR, "section.article-information.abstract").text
         title = browser.find_element(By.CSS_SELECTOR, "h1.title").text
         authors = [author.text for author in browser.find_elements(By.CSS_SELECTOR, "ul.attribution li.author")]
-        # Extract the issue and volume information
         issue_volume_info = browser.find_element(By.CSS_SELECTOR, "div.journal").text
-        paper = [issue_volume_info, [title, authors, abstract, 'Metrics NA']]
+        paper = [issue_volume_info, [title, authors, abstract]]
 
     except Exception as e:
         print(f"An error occurred: {e}")

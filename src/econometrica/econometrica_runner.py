@@ -1,14 +1,23 @@
 # -*- coding: utf-8 -*-
-"""
-Web Scapper for Academic Journals (Econometrica)
 
-This project provides a web scraping tool to extract data from academic
-journals, including article titles, authors, abstracts, and other details.
-It uses the Python programming language and the Selenium library,
-along with the Firefox web driver, to automate the process of accessing
-academic journal webpages and collecting relevant information.
-
+# =============================================================================
+# Econometrica Journal Web Scraper
+# =============================================================================
 """
+This module provides a web scraping tool to extract data from Econometrica, an academic journal.
+It automates the process of accessing webpages and collecting information like article titles,
+authors, abstracts, and issue/volume details. The tool uses Python with the Selenium library
+and Firefox web driver for scraping. The extracted data is saved in JSON format.
+
+Functions:
+    scrape_econometrica_journal(volumes, issues): Scrapes articles from specified volumes
+        and issues of Econometrica.
+
+Usage:
+    To scrape specific volumes and issues of Econometrica:
+        scrape_econometrica_journal([volume_numbers], [issue_numbers])
+"""
+
 # =============================================================================
 # Packages
 # =============================================================================
@@ -30,61 +39,55 @@ from src.econometrica.web_scraper_econometrica import get_papers_link_econometri
 # =============================================================================
 def scrape_econometrica_journal(volumes, issues):
     """
-    Scrapes information from Elsevier journal webpages and saves it in a JSON file.
-
-    This function automates the process of accessing Elsevier journal webpages to collect
-    detailed information about academic articles. It uses Selenium with GeckoDriver for
-    web scraping. The information collected includes article titles, authors, abstracts,
-    and issue/volume details. The progress of scraping is displayed using a progress bar.
+    Scrapes information from Econometrica journal webpages and saves it in a JSON file.
 
     Args:
-        volumes (list of int): A list of volume numbers to scrape. Each volume number
-                               corresponds to a volume of the journal.
-        issues (list of int or None): A list of issue numbers to scrape within each volume.
-                                      If None or empty, all issues in the specified volumes
-                                      will be scraped.
+        volumes (list of int): Volumes to scrape.
+        issues (list of int or None): Issues to scrape within each volume.
 
     Returns:
-        None: The function does not return any value. Instead, it writes the scraped data to
-              a JSON file named 'econometrica.json' in the directory specified by the global
-              variable DATA_PATH.
+        None: Saves the scraped data as a JSON file in the DATA_PATH directory.
     """
-
     output_path = os.path.join(DATA_PATH, f'econometrica.json')
     journal_url = 'https://onlinelibrary.wiley.com/toc/14680262/2023/{}/{}'
 
     html_list = []
+    corresponding_vol_iss_list = []
+
     abstract_list = []
-    url = []
+    url_vol_iss = []
 
     # Generate URLs
     try:
         for volume in volumes:
             if issues:
                 for issue in issues:
-                    url.append(journal_url.format(volume, issue))
+                    url_vol_iss.append((journal_url.format(volume, issue), f'Volume {volume} | Issue {issue}'))
             else:
-                url.append(journal_url.format(volume))
+                url_vol_iss.append(journal_url.format(volume), f'Volume {volume}')
     except Exception as e:
         raise RuntimeError(f"URL generation failed: {e}")
 
-    print(url)
-
     # Get links for each paper with progress bar
-    for site in tqdm(url, desc="Getting paper links"):
+    for site in tqdm(url_vol_iss, desc="Getting paper links"):
         try:
-            html_list = get_papers_link_econometrica(site, html_list, 5)
+            html_list, vol_iss_to_add = get_papers_link_econometrica(site[0], html_list, 5)
+
+            # Volume/Issue not scrappable so doing a manual trick.
+            corresponding_vol_iss_list.extend([site[1] for _ in range(vol_iss_to_add)])
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
 
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
-            abstract = get_abstract_info_econometrica(url_paper_list=html_list, paper_number=i, wait_time=3)
+            abstract = get_abstract_info_econometrica(url_paper_list=html_list, paper_number=i, wait_time=3,
+                                                      vol_issue=corresponding_vol_iss_list)
             if abstract:
                 abstract_list.append(abstract)
         except Exception as e:
             pass
+
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
