@@ -180,8 +180,8 @@ def main():
 
     uchicago_journals = ['edcc', 'jole', 'jle', 'jpe', 'ntj', 'reep']
 
-    # scrape_uchicago_journal(journal_name='jole', volumes=volumes, issues=issues)
-    scrape_multiple_uchicago_journals(uchicago_journals, volumes, issues)
+    scrape_uchicago_journal(journal_name='jole', volumes=volumes, issues=issues)
+    # scrape_multiple_uchicago_journals(uchicago_journals, volumes, issues)
 
 
 if __name__ == "__main__":

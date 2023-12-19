@@ -20,11 +20,54 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.common.by import By
 from config import GECKO_PATH
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 
 # =============================================================================
 # Functions
 # =============================================================================
+
+
+def get_volume_and_issue_data_uchicago(journal_name):
+    service = Service(GECKO_PATH)
+    browser = webdriver.Firefox(service=service)
+    journal_url = f'https://www.journals.uchicago.edu/loi/{journal_name}'
+    browser.get(journal_url)
+
+    # Dictionary to store volume: [(issue_number, link)]
+    volume_dict = {}
+
+    # Wait for the page to load
+    wait = WebDriverWait(browser, 10)
+    accordion_triggers = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "js-accordion__trigger")))
+
+    # Iterate over each accordion trigger to open it
+    for trigger in accordion_triggers:
+        browser.execute_script("arguments[0].click();", trigger)
+
+        # Wait for the content to load
+        wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "loi-volume__issue-dot")))
+
+        # Now find all issue link elements within the opened section
+        issue_link_elements = browser.find_elements(By.CLASS_NAME, "loi-volume__issue-dot")
+
+        for issue_link_element in issue_link_elements:
+            link = issue_link_element.get_attribute('href')
+            full_link = link if link.startswith('http') else 'https://www.journals.uchicago.edu' + link
+
+            volume_text_element = issue_link_element.find_element(By.CLASS_NAME, "issue__vol")
+            issue_text_element = issue_link_element.find_element(By.CLASS_NAME, "issue__issue")
+
+            volume = volume_text_element.text.replace("Volume ", "").strip()
+            issue_number = issue_text_element.text.replace("Number ", "").strip()
+
+            if volume not in volume_dict:
+                volume_dict[volume] = []
+            volume_dict[volume].append((issue_number, full_link))
+
+    browser.close()
+    return volume_dict
 
 # 1 - Get Url from different issues
 def get_papers_link_uchicago(url, html_list, wait_time):
