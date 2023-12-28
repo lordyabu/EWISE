@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 """
-Web Scraper for Academic Journals - Elsevier Module
+Web Scraper for Academic Journals - Econometrica Module
 
-This module provides a web scraping tool for extracting data from academic journals published by Elsevier.
+This module provides a web scraping tool for extracting data from academic journals published by Econometrica.
 It automates the process of accessing journal webpages and collecting information like article titles,
 authors, abstracts, and issue/volume details using Python, Selenium, and the Firefox web driver.
 The scraped data is structured for easy analysis and research purposes.
