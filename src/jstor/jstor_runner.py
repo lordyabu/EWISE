@@ -34,6 +34,7 @@ import json
 from tqdm import tqdm
 from config import USER_PATH, DATA_PATH
 
+
 # Developed Modules
 sys.path.append(os.path.join(USER_PATH, 'src'))
 from src.helperFunctions.jsonHelpers import save_dict_as_json, load_json_as_dict
@@ -63,7 +64,7 @@ def scrape_jstor_journal(journal_name, volumes, issues, get_link_dicts=True):
 
     # Get volumne/issue links as url pattern is unclear
     if get_link_dicts:
-        url_links = get_volume_and_issue_data_jstor(journal_url)
+        url_links = get_volume_and_issue_data_jstor(journal_url, 30)
         save_dict_as_json(url_links, f'urldict_jstor_{journal_name}.json')
     url_links_loaded = load_json_as_dict(f'urldict_jstor_{journal_name}.json')
 
@@ -107,10 +108,10 @@ def scrape_jstor_journal(journal_name, volumes, issues, get_link_dicts=True):
 # Main
 # =============================================================================
 def main():
-    volumes = [58]
+    volumes = [24]
     issues = [4]
 
-    scrape_jstor_journal(journal_name='jeconlite', volumes=volumes, issues=issues)
+    scrape_jstor_journal(journal_name='jecongrowth', volumes=volumes, issues=issues, get_link_dicts=True)
 
 
 if __name__ == "__main__":

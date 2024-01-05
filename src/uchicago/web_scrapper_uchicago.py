@@ -136,7 +136,7 @@ def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time):
         authors = ', '.join([author.text for author in browser.find_elements(By.CSS_SELECTOR, "a.author-name span")])
         abstract = browser.find_element(By.CSS_SELECTOR, "div.abstractSection.abstractInFull p").text
         issue_volume = browser.find_element(By.CSS_SELECTOR, ".current-issue__meta").text
-        paper = [issue_volume, [title, authors, abstract, 'Metrics NA']]
+        paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []
 

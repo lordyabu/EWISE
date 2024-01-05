@@ -27,23 +27,15 @@ from src.elsevier.elsevier_runner import scrape_multiple_elsevier_journals
 from src.econometrica.econometrica_runner import scrape_econometrica_journal
 from src.americanEconomicAssociation.aea_runner import scrape_multiple_aea_journals
 from src.uchicago.uchicago_runner import scrape_uchicago_journal
-def main():
-    run_jstor = False
+def main(last_x_journals):
     run_elsevier = False
     run_econometrica = False
     run_aea = False
     run_uchicago = True
 
-
-    if run_jstor:
-        journal_list = ['jeconlite']
-
-        volumes = [58]
-        issues = [4]
-
     if run_elsevier:
         #ToDo: Most likely need to manually get vol/issues for each journal
-        journal_list = ['journal-of-empirical-finance', 'journal-of-economic-behavior-and-organization',
+        journal_list = ["journal-of-empirical-finance", 'journal-of-economic-behavior-and-organization',
                         'journal-of-economic-dynamics-and-control', 'journal-of-economic-theory',
                         'journal-of-environmental-economics-and-management', 'journal-of-health-economics',
                         'journal-of-international-economics', 'journal-of-international-money-and-finance',
@@ -52,8 +44,7 @@ def main():
                         'journal-of-econometrics', 'journal-of-development-economics', 'asia-and-the-global-economy',
                         'journal-of-accounting-and-economics', 'journal-of-financial-markets',
                         'journal-of-macroeconomics',
-                        'journal-of-economics-and-business', 'journal-of-financial-economics', 'economic-modelling',
-                        'economia']
+                        'journal-of-economics-and-business', 'journal-of-financial-economics', 'economic-modelling']
         volumes = [60]
         issues = [0]
 

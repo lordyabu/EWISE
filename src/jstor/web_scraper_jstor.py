@@ -39,13 +39,15 @@ from selenium import webdriver
 from selenium.webdriver.firefox.service import Service as ServiceFF
 from selenium.webdriver.chrome.service import Service as ServiceC
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from config import GECKO_PATH, CHROME_PATH
 
 
 # =============================================================================
 # Functions
 # =============================================================================
-def get_volume_and_issue_data_jstor(url):
+def get_volume_and_issue_data_jstor(url, wait_time):
     """
     Retrieves volume and issue data from the specified JSTOR journal URL.
 
@@ -55,10 +57,35 @@ def get_volume_and_issue_data_jstor(url):
     Returns:
         volume_dict (dict): A dictionary mapping each volume to its issues and corresponding URLs.
     """
-    service = ServiceFF(GECKO_PATH)
-    browser = webdriver.Firefox(service=service)
+
+    def click_dropdowns():
+        details_elements = browser.find_elements(By.CLASS_NAME, "decade")
+
+        for detail in details_elements:
+            # Scroll the detail element into view
+            browser.execute_script("arguments[0].scrollIntoView(true);", detail)
+            time.sleep(1)  # Short wait after scrolling
+
+            try:
+                # Try clicking the element
+                if not detail.get_attribute('open'):
+                    detail.click()
+                    time.sleep(wait_time)  # Wait for content to load
+            except Exception:
+                # If click fails, use JavaScript to forcibly click the element
+                browser.execute_script("arguments[0].click();", detail)
+
+
+    service = ServiceC(CHROME_PATH)
+    browser = webdriver.Chrome(service=service)
     base_url = "https://www.jstor.org"
     browser.get(url)
+
+    time.sleep(wait_time)
+
+    click_dropdowns()
+
+    time.sleep(wait_time)
 
     # Dictionary to store volume: [(issue_number, link)]
     volume_dict = {}
