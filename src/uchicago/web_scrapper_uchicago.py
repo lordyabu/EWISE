@@ -32,6 +32,7 @@ from selenium.webdriver.common.by import By
 from config import GECKO_PATH
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import re
 
 
 # =============================================================================
@@ -135,7 +136,18 @@ def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time):
         title = browser.find_element(By.CSS_SELECTOR, "h1.citation__title").text
         authors = ', '.join([author.text for author in browser.find_elements(By.CSS_SELECTOR, "a.author-name span")])
         abstract = browser.find_element(By.CSS_SELECTOR, "div.abstractSection.abstractInFull p").text
-        issue_volume = browser.find_element(By.CSS_SELECTOR, ".current-issue__meta").text
+
+
+        issue_volume_text = browser.find_element(By.CSS_SELECTOR, ".current-issue__meta").text
+        volume_issue_match = re.search(r'Volume (\d+), Number (\d+)', issue_volume_text)
+        if volume_issue_match:
+            volume = volume_issue_match.group(1)
+            issue = volume_issue_match.group(2)
+            issue_volume = f"Volume {volume}, Issue {issue}"
+        else:
+            # Fallback in case the regex doesn't find a match
+            issue_volume = "Volume and issue information not found"
+
         paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []

@@ -86,9 +86,6 @@ def scrape_uchicago_journal(journal_name, volumes, issues):
             abstract = get_abstract_info_uchicago(url_paper_list=html_list, paper_number=i, wait_time=15)
             if abstract:
                 abstract_list.append(abstract)
-                #ToDo remove
-                print(abstract_list)
-                return None
         except Exception as e:
             pass
 
