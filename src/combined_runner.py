@@ -26,7 +26,7 @@ Usage:
 from src.elsevier.elsevier_runner import scrape_multiple_elsevier_journals
 from src.econometrica.econometrica_runner import scrape_econometrica_journal
 from src.americanEconomicAssociation.aea_runner import scrape_multiple_aea_journals
-from src.uchicago.uchicago_runner import scrape_uchicago_journal
+from src.uchicago.uchicago_runner import scrape_multiple_uchicago_journals
 def main():
     run_jstor = False
     run_elsevier = False
@@ -53,7 +53,11 @@ def main():
                         'journal-of-accounting-and-economics', 'journal-of-financial-markets',
                         'journal-of-macroeconomics',
                         'journal-of-economics-and-business', 'journal-of-financial-economics', 'economic-modelling',
-                        'economia']
+                        'economia', 'energy-policy', 'journal-of-financial-intermediation', 'european-economic-review',
+                        'review-of-economic-dynamics', 'journal-of-banking-and-finance', 'energy-economics',
+                        'journal-of-urban-economics', 'games-and-economic-behavior', 'world-development',
+                        'economics-letters', 'labour-economics', 'journal-of-corporate-finance', 'ecological-economics',
+                        'european-journal-of-political-economy']
         volumes = [60]
         issues = [0]
 
@@ -82,7 +86,7 @@ def main():
 
         uchicago_journals = ['edcc', 'jole', 'jle', 'jpe', 'ntj', 'reep']
 
-        scrape_uchicago_journal(journal_name='jpe', volumes=volumes, issues=issues)
+        scrape_multiple_elsevier_journals(journal_list=uchicago_journals, volumes=volumes, issues=issues)
 
     #ToDo: Figure out how to get past jstor detection system
 

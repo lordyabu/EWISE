@@ -119,18 +119,20 @@ def scrape_multiple_elsevier_journals(journal_list, volumes, issues):
 # Main
 # =============================================================================
 def main():
-    journal_list = ["journal-of-empirical-finance", 'journal-of-economic-behavior-and-organization',
+    journal_list = ['journal-of-empirical-finance', 'journal-of-economic-behavior-and-organization',
                     'journal-of-economic-dynamics-and-control', 'journal-of-economic-theory',
                     'journal-of-environmental-economics-and-management', 'journal-of-health-economics',
                     'journal-of-international-economics', 'journal-of-international-money-and-finance',
                     'journal-of-mathematical-economics', 'journal-of-monetary-economics', 'journal-of-public-economics',
                     'journal-of-econometrics', 'journal-of-development-economics', 'asia-and-the-global-economy',
                     'journal-of-accounting-and-economics', 'journal-of-financial-markets', 'journal-of-macroeconomics',
-                    'journal-of-economics-and-business', 'journal-of-financial-economics', 'economic-modelling']
+                    'journal-of-economics-and-business', 'journal-of-financial-economics', 'economic-modelling',
+                    'economia', 'energy-policy', 'journal-of-financial-intermediation']
     volumes = [70]
     issues = [0]
 
-    scrape_multiple_elsevier_journals(journal_list=journal_list, volumes=volumes, issues=issues)
+    scrape_elsevier_journal('journal-of-empirical-finance', volumes, issues)
+    # scrape_multiple_elsevier_journals(journal_list=journal_list, volumes=volumes, issues=issues)
 
 
 if __name__ == "__main__":

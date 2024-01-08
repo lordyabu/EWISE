@@ -11,7 +11,7 @@ The tool is designed to assist in gathering data for academic research and analy
 Functions:
     get_volume_and_issue_data_elsevier(journal_name): Retrieves volume and issue data for a specified Elsevier journal.
     get_papers_link_elsevier(url, html_list, wait_time): Retrieves URLs of papers from a specified Elsevier journal webpage.
-    get_abstract_info_elsevier(url_paper_list, paper_number, wait_time): Extracts detailed information from a paper's webpage,
+    get_abstract_info_elsevier(url_paper_list, paper_number, wait_time): Extracts detailed information from an Elsevier paper's webpage,
         including abstract, title, authors, and issue/volume information.
 
 Usage:
@@ -116,11 +116,31 @@ def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time):
         browser = webdriver.Firefox(service=service)
         browser.get(url_paper_list[paper_number])
         time.sleep(wait_time)
+
         abstract = browser.find_element(By.ID, 'abstracts').text
+        abstract = abstract.replace('Highlights\n', '')
+        abstract = abstract.replace('\n', ' ')
+        abstract = abstract.replace('•', '')
+
         title = browser.find_element(By.ID, 'screen-reader-main-title').text
+        title = re.sub(r'[^A-Za-z0-9 ]+', '', title)
+
         authors = browser.find_element(By.ID, 'author-group').text
-        issue_volume = browser.find_element(By.ID, 'publication-title').text
-        paper = [issue_volume, [title, authors, abstract]]
+        authors = authors.replace('Author links open overlay panel', '')
+        authors = authors.replace('\n', '')
+        authors = re.sub(r'\s*\d+\s*', '', authors)
+
+        # Locate the element that contains the volume and issue information
+        volume_issue_info = browser.find_element(By.CSS_SELECTOR, ".publication-volume .text-xs")
+        volume_issue_text = volume_issue_info.text.split(",")[0:2]
+
+        # Check if the second part starts with 'I' (indicating 'Issue')
+        if len(volume_issue_text) > 1 and volume_issue_text[1].strip().startswith('I'):
+            volume_issue = " ".join(volume_issue_text)
+        else:
+            volume_issue = volume_issue_text[0] + ",Issue 1"
+
+        paper = [volume_issue, [title, authors, abstract]]
     except Exception as e:
         paper = []
 
