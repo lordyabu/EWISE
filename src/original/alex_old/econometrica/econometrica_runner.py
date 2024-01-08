@@ -25,13 +25,12 @@ Usage:
 # General Modules
 import os.path
 import sys
-import json
 from tqdm import tqdm
 from config import USER_PATH, DATA_PATH
 
 # Developed Modules
 sys.path.append(os.path.join(USER_PATH, 'src'))
-from src.econometrica.web_scraper_econometrica import get_papers_link_econometrica, get_abstract_info_econometrica
+from src.original.alex_old.econometrica.web_scraper_econometrica import get_papers_link_econometrica, get_abstract_info_econometrica
 
 
 # =============================================================================
@@ -85,12 +84,18 @@ def scrape_econometrica_journal(volumes, issues):
                                                       vol_issue=corresponding_vol_iss_list)
             if abstract:
                 abstract_list.append(abstract)
+
+                #ToDo remove
+                print(abstract)
+                return None
+
         except Exception as e:
             pass
 
     # Write data to JSON file
-    with open(output_path, 'w') as json_file:
-        json.dump(abstract_list, json_file)
+    # ToDo uncomment
+    # with open(output_path, 'w') as json_file:
+    #     json.dump(abstract_list, json_file)
 
 
 # =============================================================================
@@ -98,7 +103,7 @@ def scrape_econometrica_journal(volumes, issues):
 # =============================================================================
 def main():
     volumes = [91]
-    issues = [6]
+    issues = [5]
 
     scrape_econometrica_journal(volumes=volumes, issues=issues)
 

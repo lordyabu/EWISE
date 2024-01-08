@@ -120,7 +120,7 @@ def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):
         if match:
             volume = match.group(1)
             issue = match.group(2)
-            issue_volume = f"{volume} {issue}"
+            issue_volume = f"Volume {volume}, Issue {issue}"
         else:
             issue_volume = "Volume/Issue info not found"
 

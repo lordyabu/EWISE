@@ -1,17 +1,22 @@
 from web_scrapper_wiley import get_paper_number_from_name, get_papers_link_wiley, get_abstract_info_wiley
 
 
-int_paper = get_paper_number_from_name('The Journal of Finance')
+# int_paper = get_paper_number_from_name('The Journal of Finance')
+#
+# volume = 78
+# issue = 4
 
-volume = 78
-issue = 4
+int_paper = get_paper_number_from_name('Econometrica')
 
+volume = 91
+issue = 5
 
 url = f"https://onlinelibrary.wiley.com/toc/{int_paper}/{volume}/{issue}"
 
 
 paper_links = get_papers_link_wiley(url, 15)
 
-stuffs = get_abstract_info_wiley(paper_links, 2, 15)
+
+stuffs = get_abstract_info_wiley(paper_links, 1, 15)
 
 print(stuffs)

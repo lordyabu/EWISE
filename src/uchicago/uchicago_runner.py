@@ -86,7 +86,9 @@ def scrape_uchicago_journal(journal_name, volumes, issues):
             abstract = get_abstract_info_uchicago(url_paper_list=html_list, paper_number=i, wait_time=15)
             if abstract:
                 abstract_list.append(abstract)
-                break
+                #ToDo remove
+                print(abstract_list)
+                return None
         except Exception as e:
             pass
 
@@ -124,8 +126,8 @@ def main():
 
     uchicago_journals = ['edcc', 'jole', 'jle', 'jpe', 'ntj', 'reep']
 
-    # scrape_uchicago_journal(journal_name='jole', volumes=volumes, issues=issues)
-    scrape_multiple_uchicago_journals(uchicago_journals, volumes, issues)
+    scrape_uchicago_journal(journal_name='jole', volumes=volumes, issues=issues)
+    # scrape_multiple_uchicago_journals(uchicago_journals, volumes, issues)
 
 
 if __name__ == "__main__":

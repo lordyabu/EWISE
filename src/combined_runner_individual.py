@@ -24,7 +24,7 @@ Usage:
 """
 
 from src.elsevier.elsevier_runner import scrape_multiple_elsevier_journals
-from src.econometrica.econometrica_runner import scrape_econometrica_journal
+from src.original.alex_old.econometrica.econometrica_runner import scrape_econometrica_journal
 from src.americanEconomicAssociation.aea_runner import scrape_multiple_aea_journals
 from src.uchicago.uchicago_runner import scrape_uchicago_journal
 def main(last_x_journals):
