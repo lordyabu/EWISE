@@ -119,6 +119,7 @@ def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time):
 
         abstract = browser.find_element(By.ID, 'abstracts').text
         abstract = abstract.replace('Highlights\n', '')
+        abstract = abstract.replace('Abstract ', '')
         abstract = abstract.replace('\n', ' ')
         abstract = abstract.replace('•', '')
 
@@ -138,9 +139,10 @@ def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time):
         if len(volume_issue_text) > 1 and volume_issue_text[1].strip().startswith('I'):
             volume_issue = " ".join(volume_issue_text)
         else:
-            volume_issue = volume_issue_text[0] + ",Issue 1"
+            volume_issue = volume_issue_text[0] + ", Issue 1"
 
         paper = [volume_issue, [title, authors, abstract]]
+
     except Exception as e:
         paper = []
 

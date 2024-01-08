@@ -81,7 +81,6 @@ def scrape_aea_journal(journal_name, volumes, issues, get_link_dicts=True):
                         url.append(issue_data[1])
 
     # ToDo: Modify this to take last X volumes.
-
     # If no urls found, get from the latest volume
     if len(url) == 0:
         for vol in aea_dict.keys():
@@ -93,12 +92,14 @@ def scrape_aea_journal(journal_name, volumes, issues, get_link_dicts=True):
                 break
             break
 
+
     # Get links for each paper with progress bar
     for site in tqdm(url, desc="Getting paper links"):
         try:
             html_list = get_papers_link_aea(site, html_list, 30)
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
+
 
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
@@ -112,6 +113,7 @@ def scrape_aea_journal(journal_name, volumes, issues, get_link_dicts=True):
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
 
 
 # =============================================================================
@@ -143,8 +145,8 @@ def main():
 
     aea_journals = ['mac', 'aeri', 'pol', 'app', 'mic', 'jep']
 
-    # scrape_aea_journal(journal_name='jel', volumes=volumes, issues=issues, get_link_dicts=False)
-    scrape_multiple_aea_journals(aea_journals, volumes, issues)
+    scrape_aea_journal(journal_name='jel', volumes=volumes, issues=issues, get_link_dicts=False)
+    # scrape_multiple_aea_journals(aea_journals, volumes, issues)
 
 
 if __name__ == "__main__":

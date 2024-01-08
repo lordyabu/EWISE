@@ -127,11 +127,25 @@ def get_abstract_info_aea(url_paper_list, paper_number, wait_time):
         browser = webdriver.Firefox(service=service)
         browser.get(url_paper_list[paper_number])
         time.sleep(wait_time)
+
         abstract = browser.find_element(By.CSS_SELECTOR, "section.article-information.abstract").text
+        abstract = abstract.replace('Abstract', '')
+        abstract = abstract.replace('\n', '')
+
         title = browser.find_element(By.CSS_SELECTOR, "h1.title").text
-        authors = [author.text for author in browser.find_elements(By.CSS_SELECTOR, "ul.attribution li.author")]
-        issue_volume_info = browser.find_element(By.CSS_SELECTOR, "div.journal").text
-        paper = [issue_volume_info, [title, authors, abstract]]
+
+        author_elements = browser.find_elements(By.CSS_SELECTOR, "ul.attribution li.author")
+        authors = ', '.join([author.text for author in author_elements])
+
+        issue_volume_element = browser.find_element(By.CSS_SELECTOR,
+                                                    "div[style='margin-top:25px;'] > div.journal:nth-of-type(2)")
+        issue_volume_text = issue_volume_element.text
+
+        # Format the text to extract volume and issue
+        volume_issue = " ".join(issue_volume_text.split(",")[0:2])
+        volume_issue = _reformat_volume_issue(volume_issue)
+
+        paper = [volume_issue, [title, authors, abstract]]
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -139,3 +153,29 @@ def get_abstract_info_aea(url_paper_list, paper_number, wait_time):
 
     browser.close()
     return paper
+
+
+def _reformat_volume_issue(volume_issue):
+    """
+    Reformats the volume and issue string to a more standard format.
+
+    Args:
+        volume_issue (str): The original volume and issue string, e.g., 'VOL. 61 NO. 4'
+
+    Returns:
+        str: Reformatted volume and issue string, e.g., 'Volume 61, Issue 4'
+    """
+    # Splitting the string on spaces and removing any empty strings
+    parts = [part for part in volume_issue.split() if part]
+
+    # Finding and formatting volume and issue numbers
+    volume = next((part for part in parts if part.isdigit()), None)
+    issue = next((part for part in parts if part.isdigit() and part != volume), None)
+
+    # Formatting the string
+    if volume and issue:
+        return f"Volume {volume}, Issue {issue}"
+    elif volume:
+        return f"Volume {volume}, Issue 1"
+    else:
+        return volume_issue
