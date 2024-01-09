@@ -41,17 +41,63 @@ from selenium.webdriver.support import expected_conditions as EC
 # Functions
 # =============================================================================
 
-def get_paper_number_from_name(name):
-    with open('wiley_journal_name_to_int.json', 'r') as file:
+
+def get_latest_volume_number_wiley(url, wait_time):
+    """
+    Retrieves the latest volume number from the specified Wiley journal webpage.
+
+    Args:
+        url (str): URL of the journal's webpage.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        int: The latest volume number as an integer.
+    """
+    volume_number = 0
+    try:
+        service = Service(GECKO_PATH)
+        browser = webdriver.Firefox(service=service)
+        browser.get(url)
+
+        # Wait for the page to render
+        time.sleep(wait_time)
+
+        # Find the volume element and extract the number
+        volume_element = browser.find_element(By.CSS_SELECTOR, "div.cover-image__details span.comma")
+        volume_text = volume_element.text
+        match = re.search(r"Volume (\d+)", volume_text)
+        if match:
+            volume_number = int(match.group(1))
+
+    except Exception as e:
+        print("Error: " + str(e))
+
+    finally:
+        browser.close()
+
+    return volume_number
+
+def get_paper_number_from_name_wiley(name):
+    with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
         name_dict = json.load(file)
 
     try:
-        return name_dict[name]
+        return name_dict[name][0]
     except KeyError:
-        print(f"The journal name: {name} either is not a Wiley journal or has not been added to name->int dict.")
+        print(f"The journal name: {name} either is not a Wiley journal or has not been added to name->int/#issues dict.")
 
 
-def get_papers_link_wiley(url, wait_time):
+def get_num_issues_wiley(name):
+    with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+        name_dict = json.load(file)
+
+    try:
+        return name_dict[name][1]
+    except KeyError:
+        print(f"The journal name: {name} either is not a Wiley journal or has not been added to name->int/#issues dict.")
+
+
+def get_papers_link_wiley(url, html_list, wait_time):
     """
     Retrieves URLs of papers from a specified Wiley journal webpage.
 
@@ -73,21 +119,18 @@ def get_papers_link_wiley(url, wait_time):
     # Find all elements that match the desired XPath
     articles = browser.find_elements(By.XPATH, "//a[contains(@class, 'issue-item__title visitable')]")
 
-    # Initialize a list to store the full URLs
-    paper_links = []
-
     # Construct the full URL for each paper and add it to the list
     base_url = "https://onlinelibrary.wiley.com"
 
     for article in articles:
         partial_link = article.get_attribute('href')
         full_link = base_url + partial_link if partial_link.startswith("/doi") else partial_link
-        paper_links.append(full_link)
+        html_list.append(full_link)
 
     # Close the browser
     browser.close()
 
-    return paper_links
+    return html_list
 
 
 def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):

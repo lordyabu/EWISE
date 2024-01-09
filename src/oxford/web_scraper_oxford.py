@@ -31,15 +31,60 @@ from selenium.webdriver.common.by import By
 from config import GECKO_PATH
 import re
 import json
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 # =============================================================================
 # Functions
 # =============================================================================
 
-def get_papers_link_oxford(url, wait_time):
+
+def get_latest_volume_number_oxford(url, wait_time):
+    """
+    Retrieves the latest volume number from the specified webpage.
+
+    Args:
+        url (str): URL of the journal's webpage.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        int: The latest volume number as an integer.
+    """
+    volume_number = 0
+    try:
+        service = Service(GECKO_PATH)
+        browser = webdriver.Firefox(service=service)
+        browser.get(url)
+
+        # Wait for the page to render
+        time.sleep(wait_time)
+
+        # Find the volume element and extract the number
+        volume_element = browser.find_element(By.CSS_SELECTOR, "span.volume")
+        volume_text = volume_element.text
+        match = re.search(r"Volume (\d+)", volume_text)
+        if match:
+            volume_number = int(match.group(1))
+
+    except Exception as e:
+        print("Error: " + str(e))
+
+    finally:
+        browser.close()
+
+    return volume_number
+
+
+def get_num_issues_oxford(name):
+    with open('oxford_name_to_num_issues.json', 'r') as file:
+        name_dict = json.load(file)
+
+    try:
+        return name_dict[name]
+    except KeyError:
+        print(f"The journal name: {name} either is not an Oxford journal or has not been added to name->num_issue dict.")
+
+
+def get_papers_link_oxford(url, html_list, wait_time):
     """
     Retrieves URLs of papers from a specified Oxford journal webpage.
 
@@ -61,21 +106,18 @@ def get_papers_link_oxford(url, wait_time):
     # Find all elements that match the desired XPath
     articles = browser.find_elements(By.XPATH, "//h5[@class='customLink item-title']/a")
 
-    # Initialize a list to store the full URLs
-    paper_links = []
-
     # Construct the full URL for each paper and add it to the list
     base_url = "https://academic.oup.com"
 
     for article in articles:
         partial_link = article.get_attribute('href')
         full_link = base_url + partial_link if partial_link.startswith("/doi") else partial_link
-        paper_links.append(full_link)
+        html_list.append(full_link)
 
     # Close the browser
     browser.close()
 
-    return paper_links
+    return html_list
 
 
 def get_abstract_info_oxford(url_paper_list, paper_number, wait_time):
@@ -107,7 +149,8 @@ def get_abstract_info_oxford(url_paper_list, paper_number, wait_time):
         authors = ", ".join([author.text for author in authors_elements])
 
         # Find the abstract
-        abstract = browser.find_element(gfBy.CSS_SELECTOR, "section.abstract p").text
+        abstract = browser.find_element(By.CSS_SELECTOR, "section.abstract p").text
+        abstract = re.sub(r'\\u\d{4}', '', abstract)
 
         # Find the volume and issue
         volume = browser.find_element(By.CSS_SELECTOR, "div.volume-issue__wrap .volume").text
@@ -116,7 +159,7 @@ def get_abstract_info_oxford(url_paper_list, paper_number, wait_time):
 
         paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
-        paper = ["Error: " + str(e)]
+        paper = []
 
     finally:
         browser.close()
