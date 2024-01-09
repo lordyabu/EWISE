@@ -5,35 +5,6 @@ import os.path
 from config import USER_PATH, DATA_PATH
 
 
-# int_paper = get_paper_number_from_name('The Journal of Finance')
-#
-# volume = 78
-# issue = 4
-
-# int_paper = get_paper_number_from_name_wiley('Econometrica')
-#
-# volume_url = f"https://onlinelibrary.wiley.com/journal/{int_paper}"
-#
-# latest_vol = get_latest_volume_number_wiley(volume_url, 15)
-#
-# num_issues = get_num_issues_wiley('Econometrica')
-#
-# print(latest_vol, num_issues)
-
-# volume = 91
-# issue = 5
-# 
-# url = f"https://onlinelibrary.wiley.com/toc/{int_paper}/{volume}/{issue}"
-# 
-# 
-# paper_links = get_papers_link_wiley(url, 15)
-# 
-# 
-# stuffs = get_abstract_info_wiley(paper_links, 1, 15)
-# 
-# print(stuffs)
-
-
 def scrape_multiple_wiley_journals(names, num_prev_vols, wait_time):
     for name in names:
         try:
@@ -80,22 +51,15 @@ def automatic_scrape_wiley_journal(name, num_prev_vols, wait_time):
     for site in tqdm(url, desc="Getting paper links"):
         try:
             html_list = get_papers_link_wiley(site, html_list, wait_time)
-            #ToDo remove
-            if len(html_list) > 2:
-                break
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
 
-    # ToDo remove
-    print(html_list)
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
             abstract = get_abstract_info_wiley(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
-            # ToDo remove
             if abstract:
                 abstract_list.append(abstract)
-                break
         except Exception as e:
             pass
 
