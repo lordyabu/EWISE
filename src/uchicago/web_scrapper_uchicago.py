@@ -33,62 +33,51 @@ from config import GECKO_PATH
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
-
+import json
 
 # =============================================================================
 # Functions
 # =============================================================================
 
-# Currently Not in use
-def get_volume_and_issue_data_uchicago(journal_name):
-    """
-    Retrieves volume and issue data from the specified University of Chicago journal URL.
 
-    Args:
-        journal_name (str): Name of the University of Chicago journal.
+def get_num_issues_uchicago(name):
+    with open('uchicago_journal_name_to_num_issues.json', 'r') as file:
+        name_dict = json.load(file)
 
-    Returns:
-        volume_dict (dict): A dictionary mapping each volume to its issues and corresponding URLs.
-    """
+    try:
+        return name_dict[name]
+    except KeyError:
+        print(f"The journal name: {name} either is not a UChicago journal or has not been added to name->#issues dict.")
+
+
+def get_latest_volume_uchicago(journal_name):
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
-    journal_url = f'https://www.journals.uchicago.edu/loi/{journal_name}'
+    journal_url = f'https://www.journals.uchicago.edu/toc/{journal_name}/current'
     browser.get(journal_url)
 
-    # Dictionary to store volume: [(issue_number, link)]
-    volume_dict = {}
+    time.sleep(5)  # Wait for the page to load
 
-    # Wait for the page to load
-    wait = WebDriverWait(browser, 10)
-    accordion_triggers = wait.until(EC.presence_of_all_elements_located((By.CLASS_NAME, "js-accordion__trigger")))
+    try:
+        # Locate the elements containing volume and issue information
+        volume_element = browser.find_element(By.CSS_SELECTOR, "div.cover-image__details .journal-meta span.citation-line:first-child")
 
-    # Iterate over each accordion trigger to open it
-    for trigger in accordion_triggers:
-        browser.execute_script("arguments[0].click();", trigger)
+        volume_info = volume_element.text
 
-        # Wait for the content to load
-        wait.until(EC.visibility_of_element_located((By.CLASS_NAME, "loi-volume__issue-dot")))
+        volume_match = re.search(r"Volume (\d+)", volume_info)
+        if volume_match:
+            latest_volume = int(volume_match.group(1))
+        else:
+            raise ValueError("Volume or issue number not found")
 
-        # Now find all issue link elements within the opened section
-        issue_link_elements = browser.find_elements(By.CLASS_NAME, "loi-volume__issue-dot")
+    except Exception as e:
+        print(f"Error occurred: {e}")
+        latest_volume = None
 
-        for issue_link_element in issue_link_elements:
-            link = issue_link_element.get_attribute('href')
-            full_link = link if link.startswith('http') else 'https://www.journals.uchicago.edu' + link
+    finally:
+        browser.close()
 
-            volume_text_element = issue_link_element.find_element(By.CLASS_NAME, "issue__vol")
-            issue_text_element = issue_link_element.find_element(By.CLASS_NAME, "issue__issue")
-
-            volume = volume_text_element.text.replace("Volume ", "").strip()
-            issue_number = issue_text_element.text.replace("Number ", "").strip()
-
-            if volume not in volume_dict:
-                volume_dict[volume] = []
-            volume_dict[volume].append((issue_number, full_link))
-
-    browser.close()
-    return volume_dict
-
+    return latest_volume
 
 def get_papers_link_uchicago(url, html_list, wait_time):
     """
@@ -154,3 +143,4 @@ def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time):
 
     browser.close()
     return paper
+

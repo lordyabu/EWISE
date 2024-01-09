@@ -44,7 +44,57 @@ from src.americanEconomicAssociation.web_scraper_aea import get_papers_link_aea,
 # =============================================================================
 # Scraper/Saver
 # =============================================================================
-def scrape_aea_journal(journal_name, volumes, issues, get_link_dicts=True):
+
+
+def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
+    journal_url = f'https://www.aeaweb.org/journals/{name}/issues'
+
+    output_path = os.path.join(DATA_PATH, f'aea_{name}.json')
+
+    aea_dict = get_volume_and_issue_data_aea(journal_url)
+
+    html_list = []
+    abstract_list = []
+    url = []
+
+    count = 0
+
+    if len(url) == 0:
+        for vol in aea_dict.keys():
+            for issue_data in aea_dict[vol]:
+                url.append(issue_data[1])
+
+            count += 1
+            if count == num_prev_vols:
+                break
+
+    # Get links for each paper with progress bar
+    for site in tqdm(url, desc="Getting paper links"):
+        try:
+            html_list = get_papers_link_aea(site, html_list, wait_time)
+            #ToDo remove
+            if len(html_list) > 3:
+                break
+        except Exception as e:
+            raise RuntimeError(f"Failed to get links for each paper: {e}")
+
+    # Get Abstracts with progress bar
+    for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
+        try:
+            abstract = get_abstract_info_aea(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
+            if abstract:
+                abstract_list.append(abstract)
+                # ToDo remove
+                break
+        except Exception as e:
+            pass
+
+    # Write data to JSON file
+    with open(output_path, 'w') as json_file:
+        json.dump(abstract_list, json_file)
+
+
+def manual_scrape_aea_journal(name, volumes, issues, wait_time):
     """
     Scrapes a specified Elsevier journal for academic articles.
 
@@ -57,16 +107,11 @@ def scrape_aea_journal(journal_name, volumes, issues, get_link_dicts=True):
         None: Saves the scraped data as a JSON file.
     """
 
-    journal_url = f'https://www.aeaweb.org/journals/{journal_name}/issues'
+    journal_url = f'https://www.aeaweb.org/journals/{name}/issues'
 
-    output_path = os.path.join(DATA_PATH, f'aea_{journal_name}.json')
+    output_path = os.path.join(DATA_PATH, f'aea_{name}.json')
 
-    if get_link_dicts:
-        url_links = get_volume_and_issue_data_aea(journal_url)
-
-        save_dict_as_json(url_links, f'urldict_aea_{journal_name}.json')
-
-    aea_dict = load_json_as_dict(f'urldict_aea_{journal_name}.json')
+    aea_dict = get_volume_and_issue_data_aea(journal_url)
 
     html_list = []
     abstract_list = []
@@ -80,40 +125,30 @@ def scrape_aea_journal(journal_name, volumes, issues, get_link_dicts=True):
                     if issue_data[0] == str(issue):
                         url.append(issue_data[1])
 
-    # ToDo: Modify this to take last X volumes.
-    # If no urls found, get from the latest volume
-    if len(url) == 0:
-        for vol in aea_dict.keys():
-            for issue in issues:
-                for issue_data in aea_dict[vol]:
-                    if issue_data[0] == str(issue):
-                        url.append(issue_data[1])
-                        break
-                break
-            break
-
-
     # Get links for each paper with progress bar
     for site in tqdm(url, desc="Getting paper links"):
         try:
-            html_list = get_papers_link_aea(site, html_list, 30)
+            html_list = get_papers_link_aea(site, html_list, wait_time)
+            #ToDo remove
+            if len(html_list) > 3:
+                break
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
-
 
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
-            abstract = get_abstract_info_aea(url_paper_list=html_list, paper_number=i, wait_time=30)
+            abstract = get_abstract_info_aea(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
             if abstract:
                 abstract_list.append(abstract)
+                # ToDo remove
+                break
         except Exception as e:
             pass
 
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
-
 
 
 # =============================================================================
@@ -133,7 +168,10 @@ def scrape_multiple_aea_journals(journal_list, volumes, issues):
     """
     for journal_name in journal_list:
         print(f"Starting {journal_name}")
-        scrape_aea_journal(journal_name, volumes, issues)
+        try:
+            automatic_scrape_aea_journal(journal_name, num_prev_vols=1, wait_time=30)
+        except Exception as e:
+            print(e)
 
 
 # =============================================================================
@@ -145,8 +183,8 @@ def main():
 
     aea_journals = ['mac', 'aeri', 'pol', 'app', 'mic', 'jep']
 
-    scrape_aea_journal(journal_name='jel', volumes=volumes, issues=issues, get_link_dicts=False)
-    # scrape_multiple_aea_journals(aea_journals, volumes, issues)
+    # scrape_aea_journal(journal_name='jel', volumes=volumes, issues=issues, get_link_dicts=False)
+    scrape_multiple_aea_journals(aea_journals, volumes, issues)
 
 
 if __name__ == "__main__":

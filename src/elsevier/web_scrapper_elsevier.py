@@ -50,15 +50,6 @@ def get_num_issues_elsevier(name):
 
 # Currently Not in use
 def get_latest_volume_elsevier(journal_name):
-    """
-    Retrieves latests volume from the specified Elsevier journal URL.
-
-    Args:
-        journal_name (str): Name of the Elsevier journal.
-
-    Returns:
-        volume_dict (dict): A dictionary mapping each volume to its issues and corresponding URLs.
-    """
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
     journal_url = f'https://www.sciencedirect.com/journal/{journal_name}/issues'
@@ -70,7 +61,6 @@ def get_latest_volume_elsevier(journal_name):
     for issue_link_element in issue_link_elements:
         volume_text = issue_link_element.text
         volume_match = re.search(r"Volume (\d+)", volume_text)
-        print(volume_match, volume_text)
         if volume_match:
             volume = volume_match.group(1)
             return volume

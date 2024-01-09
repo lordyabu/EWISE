@@ -36,13 +36,65 @@ from config import USER_PATH, DATA_PATH
 
 # Developed Modules
 sys.path.append(os.path.join(USER_PATH, 'src'))
-from src.uchicago.web_scrapper_uchicago import get_papers_link_uchicago, get_abstract_info_uchicago
+from src.uchicago.web_scrapper_uchicago import get_papers_link_uchicago, get_abstract_info_uchicago, get_num_issues_uchicago, get_latest_volume_uchicago
 
 
 # =============================================================================
 # Scraper/Saver
 # =============================================================================
-def scrape_uchicago_journal(journal_name, volumes, issues):
+
+
+def automatic_scrape_uchicago_journal(name, num_prev_vols, wait_time):
+    output_path = os.path.join(DATA_PATH, f'uchicago_{name}.json')
+    journal_url = 'https://www.journals.uchicago.edu/toc/{}/{{}}/{{}}'.format(name)
+
+    html_list = []
+    abstract_list = []
+    url = []
+
+    latest_vol = int(get_latest_volume_uchicago(name))
+    starting_vol = max(1, latest_vol - num_prev_vols + 1)
+    volumes = [vol for vol in range(starting_vol, latest_vol + 1)]
+
+    num_issues = get_num_issues_uchicago(name)
+    issues = [i for i in range(1, num_issues + 1)]
+
+    # Generate URLs
+    try:
+        for volume in volumes:
+            if issues:
+                for issue in issues:
+                    url.append(journal_url.format(volume, issue))
+            else:
+                url.append(journal_url.format(volume))
+    except Exception as e:
+        raise RuntimeError(f"URL generation failed: {e}")
+
+    # Get links for each paper with progress bar
+    for site in tqdm(url, desc="Getting paper links"):
+        try:
+            html_list = get_papers_link_uchicago(site, html_list, wait_time)
+            #ToDo remove
+            if len(html_list) > 3:
+                break
+        except Exception as e:
+            raise RuntimeError(f"Failed to get links for each paper: {e}")
+
+    # Get Abstracts with progress bar
+    for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
+        try:
+            abstract = get_abstract_info_uchicago(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
+            if abstract:
+                abstract_list.append(abstract)
+                # ToDo remove
+                break
+        except Exception as e:
+            pass
+
+    # Write data to JSON file
+    with open(output_path, 'w') as json_file:
+        json.dump(abstract_list, json_file)
+def manual_scrape_uchicago_journal(name, volumes, issues, wait_time):
     """
     Scrapes information from University of Chicago journal webpages and saves it in a JSON file.
 
@@ -55,8 +107,8 @@ def scrape_uchicago_journal(journal_name, volumes, issues):
         None: Saves the scraped data as a JSON file in the DATA_PATH directory.
     """
 
-    output_path = os.path.join(DATA_PATH, f'uchicago_{journal_name}.json')
-    journal_url = 'https://www.journals.uchicago.edu/toc/{}/{{}}/{{}}'.format(journal_name)
+    output_path = os.path.join(DATA_PATH, f'uchicago_{name}.json')
+    journal_url = 'https://www.journals.uchicago.edu/toc/{}/{{}}/{{}}'.format(name)
 
     html_list = []
     abstract_list = []
@@ -76,14 +128,14 @@ def scrape_uchicago_journal(journal_name, volumes, issues):
     # Get links for each paper with progress bar
     for site in tqdm(url, desc="Getting paper links"):
         try:
-            html_list = get_papers_link_uchicago(site, html_list, 5)
+            html_list = get_papers_link_uchicago(site, html_list, wait_time)
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
 
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
-            abstract = get_abstract_info_uchicago(url_paper_list=html_list, paper_number=i, wait_time=15)
+            abstract = get_abstract_info_uchicago(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
             if abstract:
                 abstract_list.append(abstract)
         except Exception as e:
@@ -97,7 +149,7 @@ def scrape_uchicago_journal(journal_name, volumes, issues):
 # =============================================================================
 # Run Multiple
 # =============================================================================
-def scrape_multiple_uchicago_journals(journal_list, volumes, issues):
+def scrape_multiple_uchicago_journals(journal_list, num_prev_vols, wait_time):
     """
     Scrapes multiple University of Chicago journals for academic articles.
 
@@ -111,20 +163,24 @@ def scrape_multiple_uchicago_journals(journal_list, volumes, issues):
     """
     for journal_name in journal_list:
         print(f"Starting {journal_name}")
-        scrape_uchicago_journal(journal_name, volumes, issues)
+        try:
+            automatic_scrape_uchicago_journal(journal_name, num_prev_vols, wait_time)
+        except Exception as e:
+            print(f"Journal {journal_name} error")
+            print(e)
 
 
 # =============================================================================
 # Main
 # =============================================================================
 def main():
-    volumes = [41]
-    issues = [4]
+    # volumes = [41]
+    # issues = [4]
 
     uchicago_journals = ['edcc', 'jole', 'jle', 'jpe', 'ntj', 'reep']
 
-    scrape_uchicago_journal(journal_name='jole', volumes=volumes, issues=issues)
-    # scrape_multiple_uchicago_journals(uchicago_journals, volumes, issues)
+    #manual_scrape_uchicago_journal(journal_name='jole', volumes=volumes, issues=issues)
+    scrape_multiple_uchicago_journals(uchicago_journals, 1, 15)
 
 
 if __name__ == "__main__":

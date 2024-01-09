@@ -148,7 +148,6 @@ def get_abstract_info_aea(url_paper_list, paper_number, wait_time):
         paper = [volume_issue, [title, authors, abstract]]
 
     except Exception as e:
-        print(f"An error occurred: {e}")
         paper = []
 
     browser.close()

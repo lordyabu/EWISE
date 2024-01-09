@@ -49,18 +49,19 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
     output_path = os.path.join(DATA_PATH, f'elsevier_{name}.json')
     volume_url = f"https://www.sciencedirect.com/journal/{name}/issues"
     journal_url = 'https://www.sciencedirect.com/journal/{}/vol/{{}}/suppl/C'.format(name)
+    journal_multiple_issue_url = 'https://www.sciencedirect.com/journal/{}/vol/{{}}/issue/{{}}'.format(name)
 
     html_list = []
     abstract_list = []
     url = []
 
-    latest_vol = get_latest_volume_elsevier(volume_url, wait_time)
+    latest_vol = int(get_latest_volume_elsevier(name))
     starting_vol = max(1, latest_vol - num_prev_vols + 1)
     volumes = [vol for vol in range(starting_vol, latest_vol + 1)]
 
     if get_num_issues_elsevier(name) != "No Issues":
-        raise ValueError(f"Journal type: multiple issues, {name} has not been implemented yet")
-        issues = get_num_issues_elsevier(name)
+        num_issues = get_num_issues_elsevier(name)
+        issues = [i for i in range(1, num_issues + 1)]
     else:
         issues = None
 
@@ -70,7 +71,7 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
         for volume in volumes:
             if issues:
                 for issue in issues:
-                    url.append(journal_url.format(volume, issue))
+                    url.append(journal_multiple_issue_url.format(volume, issue))
             else:
                 url.append(journal_url.format(volume))
     except Exception as e:
@@ -80,6 +81,7 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
     for site in tqdm(url, desc="Getting paper links"):
         try:
             html_list = get_papers_link_elsevier(site, html_list, wait_time)
+
             #ToDo remove
             if len(html_list) > 3:
                 break
@@ -92,6 +94,8 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
             abstract = get_abstract_info_elsevier(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
             if abstract:
                 abstract_list.append(abstract)
+                # ToDo remove
+                break
         except Exception as e:
             pass
 
@@ -183,6 +187,8 @@ def main():
                     'european-journal-of-political-economy']
     # volumes = [70]
     # issues = [0]
+
+    journal_list = ['journal-of-financial-economics', 'economia', 'journal-of-accounting-and-economics', 'asia-and-the-global-economy', 'journal-of-econometrics']
 
     # scrape_elsevier_journal('journal-of-empirical-finance', volumes, issues)
     scrape_multiple_elsevier_journals(journal_list=journal_list, num_prev_vols=1, wait_time=15)

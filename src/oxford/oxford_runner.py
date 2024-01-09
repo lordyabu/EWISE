@@ -126,7 +126,7 @@ def manual_scrape_oxford_journals(name, volumes, issues, wait_time):
 
 
 def main():
-    journal_list = ["jfec"]
+    journal_list = ["restud"]
 
     scrape_multiple_oxford_journals(journal_list, 1, 15)
 
