@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 
 """
-Web Scraper for Academic Journals - Wiley Module
+Web Scraper for Academic Journals - Oxford Module
 
-This module provides a web scraping tool to extract data from academic journals published by Wiley.
+This module provides a web scraping tool to extract data from academic journals published by Oxford.
 It automates the process of accessing journal webpages and collecting information such as article titles,
 authors, abstracts, and issue/volume details using Python, Selenium, and the Firefox web driver.
 The tool is designed to assist in gathering data for academic research and analysis.
 
 Functions:
-    get_papers_link_wiley(url, html_list, wait_time): Retrieves URLs of papers from a specified Wiley journal webpage.
-    get_abstract_info_wiley(url_paper_list, paper_number, wait_time): Extracts detailed information from a Wiley paper's webpage,
+    get_papers_link_oxford(url, html_list, wait_time): Retrieves URLs of papers from a specified Oxford journal webpage.
+    get_abstract_info_oxford(url_paper_list, paper_number, wait_time): Extracts detailed information from a Oxford paper's webpage,
         including abstract, title, authors, and issue/volume information.
 
 Usage:
     1. Collect paper URLs:
-        paper_urls = get_papers_link_wiley(journal_url, [], wait_time)
+        paper_urls = get_papers_link_oxford(journal_url, [], wait_time)
 
     2. Extract paper details:
-        paper_info = get_abstract_info_wiley(paper_urls, paper_index, wait_time)
+        paper_info = get_abstract_info_oxford(paper_urls, paper_index, wait_time)
 """
 
 # =============================================================================
@@ -35,25 +35,13 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-
-
 # =============================================================================
 # Functions
 # =============================================================================
 
-def get_paper_number_from_name(name):
-    with open('wiley_journal_name_to_int.json', 'r') as file:
-        name_dict = json.load(file)
-
-    try:
-        return name_dict[name]
-    except KeyError:
-        print(f"The journal name: {name} either is not a Wiley journal or has not been added to name->int dict.")
-
-
-def get_papers_link_wiley(url, wait_time):
+def get_papers_link_oxford(url, wait_time):
     """
-    Retrieves URLs of papers from a specified Wiley journal webpage.
+    Retrieves URLs of papers from a specified Oxford journal webpage.
 
     Args:
         url (str): URL of the journal's webpage.
@@ -71,13 +59,13 @@ def get_papers_link_wiley(url, wait_time):
     time.sleep(wait_time)
 
     # Find all elements that match the desired XPath
-    articles = browser.find_elements(By.XPATH, "//a[contains(@class, 'issue-item__title visitable')]")
+    articles = browser.find_elements(By.XPATH, "//h5[@class='customLink item-title']/a")
 
     # Initialize a list to store the full URLs
     paper_links = []
 
     # Construct the full URL for each paper and add it to the list
-    base_url = "https://onlinelibrary.wiley.com"
+    base_url = "https://academic.oup.com"
 
     for article in articles:
         partial_link = article.get_attribute('href')
@@ -90,9 +78,9 @@ def get_papers_link_wiley(url, wait_time):
     return paper_links
 
 
-def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):
+def get_abstract_info_oxford(url_paper_list, paper_number, wait_time):
     """
-    Retrieves detailed information of a specific paper from Wiley.
+    Retrieves detailed information of a specific paper from Oxford.
 
     Args:
         url_paper_list (list): List of paper URLs.
@@ -108,34 +96,30 @@ def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):
         browser = webdriver.Firefox(service=service)
         browser.get(url_paper_list[paper_number])
 
-        WebDriverWait(browser, wait_time).until(
-            EC.presence_of_element_located((By.CLASS_NAME, "volume-issue"))
-        )
+        # Wait for the page to render
+        time.sleep(wait_time)
 
-        # Find the volume-issue element and extract text
-        volume_issue_element = browser.find_element(By.CLASS_NAME, 'volume-issue')
-        volume_issue_text = volume_issue_element.get_attribute('outerHTML')
-        match = re.search(r"Volume (\d+), Issue (\d+)", volume_issue_text)
-        if match:
-            volume = match.group(1)
-            issue = match.group(2)
-            issue_volume = f"Volume {volume}, Issue {issue}"
-        else:
-            issue_volume = "Volume/Issue info not found"
+        # Find the title
+        title = browser.find_element(By.CSS_SELECTOR, "h1.wi-article-title").text
 
-        # Find the citation title
-        citation_title = browser.find_element(By.CLASS_NAME, 'citation__title').text
-
-        authors_elements = browser.find_elements(By.XPATH,
-                                                 "//div[@id='sb-1']/div/div/span/a/span")
+        # Find the authors
+        authors_elements = browser.find_elements(By.CSS_SELECTOR, "div.wi-authors span.al-author-name-more button.linked-name")
         authors = ", ".join([author.text for author in authors_elements])
 
-        abstract = browser.find_element(By.XPATH, "//div[contains(@class, 'article-section__content')]/p").text
-        paper = [issue_volume, [citation_title, authors, abstract]]
+        # Find the abstract
+        abstract = browser.find_element(gfBy.CSS_SELECTOR, "section.abstract p").text
+
+        # Find the volume and issue
+        volume = browser.find_element(By.CSS_SELECTOR, "div.volume-issue__wrap .volume").text
+        issue = browser.find_element(By.CSS_SELECTOR, "div.volume-issue__wrap .issue").text
+        issue_volume = f"{volume}, {issue}"
+
+        paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
-        paper = []
+        paper = ["Error: " + str(e)]
 
     finally:
         browser.close()
 
     return paper
+
