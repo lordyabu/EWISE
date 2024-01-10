@@ -22,7 +22,7 @@ def scrape_springer_journal(name, automatic_collection, num_prev_vols, manual_vo
 
 def automatic_scrape_springer_journal(name, num_prev_vols, wait_time):
     int_paper = get_paper_number_from_name_springer(name)
-    volume_url = f"https://link.springer.com/journal/{int_paper}"
+    volume_url = f"https://link.springer.com/journal/{int_paper}/volumes-and-issues"
     journal_url = "https://link.springer.com/journal/{}/volumes-and-issues/{{}}-{{}}".format(int_paper)
     output_path = os.path.join(DATA_PATH, f'springer_{name}.json')
 
@@ -52,11 +52,13 @@ def automatic_scrape_springer_journal(name, num_prev_vols, wait_time):
         try:
             html_list = get_papers_link_springer(site, html_list, wait_time)
             # #ToDo remove
+            # print(html_list)
             # if len(html_list) > 3:
             #     break
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
 
+    # print(html_list)
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
@@ -115,7 +117,7 @@ def manual_scrape_springer_journals(name, volumes, issues, wait_time):
 
 
 def main():
-    journal_list = ['IMF Economic Review', 'Journal of Population Economics']
+    journal_list = ['IMF Economic Review']
 
     scrape_multiple_springer_journals(journal_list, 2, 15)
 

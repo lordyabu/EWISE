@@ -63,10 +63,15 @@ def get_latest_volume_number_springer(url, wait_time):
         # Wait for the page to render
         time.sleep(wait_time)
 
-        # Find the volume element and extract the number
-        volume_element = browser.find_element(By.CSS_SELECTOR, "p.app-journal-latest-issue__volume a")
+        # Find the first occurrence of the volume element and extract the number
+        try:
+            # Try the first CSS selector
+            volume_element = browser.find_element(By.CSS_SELECTOR, "li.app-section h2.app-section__heading span.u-display-block.u-flex-grow")
+        except:
+            # If the first selector fails, try the second one
+            volume_element = browser.find_element(By.CSS_SELECTOR, "li.app-vol-and-issues-item h2 span")
         volume_text = volume_element.text
-        match = re.search(r"Volume (\d+), Issue \d+", volume_text)
+        match = re.search(r"Volume (\d+)", volume_text)
         if match:
             volume_number = int(match.group(1))
 
@@ -77,6 +82,7 @@ def get_latest_volume_number_springer(url, wait_time):
         browser.close()
 
     return volume_number
+
 
 #DONE
 def get_paper_number_from_name_springer(name):
@@ -122,6 +128,10 @@ def get_papers_link_springer(url, html_list, wait_time):
 
         # Find all elements that match the desired selector
         articles = browser.find_elements(By.CSS_SELECTOR, "article.c-card-open h3.c-card-open__heading a")
+
+        # IMF for some reason does not follow above format here
+        if not articles:
+            articles = browser.find_elements(By.CSS_SELECTOR, "li.c-list-group__item a")
 
         for article in articles:
             link = article.get_attribute('href')
@@ -181,4 +191,5 @@ def get_abstract_info_springer(url_paper_list, paper_number, wait_time):
         browser.close()
 
     return paper
+
 
