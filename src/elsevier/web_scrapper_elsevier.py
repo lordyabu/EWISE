@@ -9,16 +9,23 @@ authors, abstracts, and issue/volume details using Python, Selenium, and the Fir
 The tool is designed to assist in gathering data for academic research and analysis.
 
 Functions:
-    get_latest_volume_elsevier(journal_name): Retrieves latest volume for a specified Elsevier journal.
+    get_num_issues_elsevier(journal_name): Retrieves the number of issues available for a specified Elsevier journal.
+    get_latest_volume_elsevier(journal_name): Retrieves the latest volume for a specified Elsevier journal.
     get_papers_link_elsevier(url, html_list, wait_time): Retrieves URLs of papers from a specified Elsevier journal webpage.
     get_abstract_info_elsevier(url_paper_list, paper_number, wait_time): Extracts detailed information from an Elsevier paper's webpage,
         including abstract, title, authors, and issue/volume information.
 
 Usage:
-    1. Collect paper URLs:
+    1. Retrieve the latest volume number:
+        latest_volume_number = get_latest_volume_elsevier(journal_url, wait_time)
+
+    2. Retrieve the number of issues:
+        num_issues = get_num_issues_elsevier(journal_name)
+
+    3. Collect paper URLs:
         paper_urls = get_papers_link_elsevier(journal_url, [], wait_time)
 
-    2. Extract paper details:
+    4. Extract paper details:
         paper_info = get_abstract_info_elsevier(paper_urls, paper_index, wait_time)
 """
 
@@ -40,6 +47,16 @@ import json
 
 
 def get_num_issues_elsevier(name):
+    """
+    Retrieves the number of issues available for a specified Elsevier journal.
+
+    Args:
+        name (str): Name of the Elsevier journal.
+
+    Returns:
+        int or str: Number of issues if available, else 'No Issues'.
+    """
+
     try:
         with open('elsevier_journals_with_issues.json', 'r') as file:
             name_dict = json.load(file)
@@ -52,8 +69,18 @@ def get_num_issues_elsevier(name):
     except KeyError:
         return "No Issues"
 
-# Currently Not in use
+
 def get_latest_volume_elsevier(journal_name):
+    """
+    Retrieves the latest volume number of a specified Elsevier journal.
+
+    Args:
+        journal_name (str): The name of the Elsevier journal.
+
+    Returns:
+        str: The latest volume number, or None if not found.
+    """
+
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
     journal_url = f'https://www.sciencedirect.com/journal/{journal_name}/issues'
@@ -70,7 +97,6 @@ def get_latest_volume_elsevier(journal_name):
             return volume
 
 
-
 def get_papers_link_elsevier(url, html_list, wait_time):
     """
     Retrieves URLs of papers from a specified Elsevier journal webpage.
@@ -83,6 +109,7 @@ def get_papers_link_elsevier(url, html_list, wait_time):
     Returns:
         html_list (list): Updated list with URLs of papers.
     """
+
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
     browser.get(url)
@@ -106,6 +133,7 @@ def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time):
     Returns:
         paper (list): A list containing detailed information of the paper.
     """
+
     try:
         service = Service(GECKO_PATH)
         browser = webdriver.Firefox(service=service)

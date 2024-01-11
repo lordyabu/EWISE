@@ -9,15 +9,27 @@ authors, abstracts, and issue/volume details using Python, Selenium, and the Fir
 The tool is designed to assist in gathering data for academic research and analysis.
 
 Functions:
+    get_latest_volume_number_wiley(url, wait_time): Retrieves the latest volume number from a specified Wiley journal.
+    get_paper_number_from_name_wiley(name): Retrieves the internal paper number associated with a Wiley journal name.
+    get_num_issues_wiley(name): Retrieves the number of issues available for a specified Wiley journal.
     get_papers_link_wiley(url, html_list, wait_time): Retrieves URLs of papers from a specified Wiley journal webpage.
     get_abstract_info_wiley(url_paper_list, paper_number, wait_time): Extracts detailed information from a Wiley paper's webpage,
         including abstract, title, authors, and issue/volume information.
 
 Usage:
-    1. Collect paper URLs:
+    1. Retrieve the latest volume number:
+        latest_volume_number = get_latest_volume_number_wiley(journal_url, wait_time)
+
+    2. Retrieve paper number from journal name:
+        paper_number = get_paper_number_from_name_wiley(journal_name)
+
+    3. Retrieve the number of issues:
+        num_issues = get_num_issues_wiley(journal_name)
+
+    4. Collect paper URLs:
         paper_urls = get_papers_link_wiley(journal_url, [], wait_time)
 
-    2. Extract paper details:
+    5. Extract paper details:
         paper_info = get_abstract_info_wiley(paper_urls, paper_index, wait_time)
 """
 
@@ -35,11 +47,61 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-
-
 # =============================================================================
 # Functions
 # =============================================================================
+
+
+def get_paper_number_from_name_wiley(name):
+    """
+    Retrieves the internal paper number associated with a Wiley journal name.
+
+    Args:
+        name (str): The name of the Wiley journal.
+
+    Returns:
+        int: The internal paper number for the specified journal, if found.
+        None: If the journal name is not in the dictionary or an error occurs.
+    """
+
+    try:
+        with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('wiley/wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+
+    try:
+        return name_dict[name][0]
+    except KeyError:
+        print(
+            f"The journal name: {name} either is not a Wiley journal or has not been added to name->int/#issues dict.")
+
+
+def get_num_issues_wiley(name):
+    """
+    Retrieves the number of issues for a specified Wiley journal.
+
+    Args:
+        name (str): The name of the Wiley journal.
+
+    Returns:
+        int: The number of issues for the specified journal, if found.
+        None: If the journal name is not in the dictionary or an error occurs.
+    """
+
+    try:
+        with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('wiley/wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+
+    try:
+        return name_dict[name][1]
+    except KeyError:
+        print(
+            f"The journal name: {name} either is not a Wiley journal or has not been added to name->int/#issues dict.")
 
 
 def get_latest_volume_number_wiley(url, wait_time):
@@ -53,6 +115,7 @@ def get_latest_volume_number_wiley(url, wait_time):
     Returns:
         int: The latest volume number as an integer.
     """
+
     volume_number = 0
     try:
         service = Service(GECKO_PATH)
@@ -77,33 +140,6 @@ def get_latest_volume_number_wiley(url, wait_time):
 
     return volume_number
 
-def get_paper_number_from_name_wiley(name):
-    try:
-        with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
-            name_dict = json.load(file)
-    except:
-        with open('wiley/wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
-            name_dict = json.load(file)
-
-    try:
-        return name_dict[name][0]
-    except KeyError:
-        print(f"The journal name: {name} either is not a Wiley journal or has not been added to name->int/#issues dict.")
-
-
-def get_num_issues_wiley(name):
-    try:
-        with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
-            name_dict = json.load(file)
-    except:
-        with open('wiley/wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
-            name_dict = json.load(file)
-
-    try:
-        return name_dict[name][1]
-    except KeyError:
-        print(f"The journal name: {name} either is not a Wiley journal or has not been added to name->int/#issues dict.")
-
 
 def get_papers_link_wiley(url, html_list, wait_time):
     """
@@ -116,6 +152,7 @@ def get_papers_link_wiley(url, html_list, wait_time):
     Returns:
         paper_links (list): List of URLs of papers.
     """
+
     # Initialize the browser
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
@@ -153,6 +190,7 @@ def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):
     Returns:
         paper (list): A list containing detailed information of the paper.
     """
+
     try:
         service = Service(GECKO_PATH)
         browser = webdriver.Firefox(service=service)

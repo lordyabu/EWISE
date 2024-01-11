@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """
-Web Scraper for Academic Journals - Elsevier Module
+Web Scraper for Academic Journals - AEA Module
 
-This module provides a web scraping tool to extract data from academic journals published by Elsevier.
-It automates the process of accessing journal webpages and collecting information like article titles,
-authors, abstracts, and issue/volume details. The tool uses Python, Selenium, and BeautifulSoup along
-with the Firefox web driver for scraping. The extracted data is collected in a structured format.
+This module provides a web scraping tool to extract data from academic journals published by the American Economic Association (AEA).
+It automates the process of accessing journal webpages and collecting information like article titles, authors, abstracts,
+and issue/volume details. The tool uses Python, Selenium, and BeautifulSoup along with the Firefox web driver for scraping.
+The extracted data is collected in a structured format.
 
 Functions:
-    get_volume_and_issue_data_aea(url): Retrieves volume and issue data for a specified journal.
+    get_volume_and_issue_data_aea(url): Retrieves volume and issue data for a specified AEA journal.
     get_papers_link_aea(url, html_list, wait_time): Collects paper URLs from a journal's webpage.
     get_abstract_info_aea(url_paper_list, paper_number, wait_time): Extracts abstract, title, authors,
         and issue/volume information from a paper's webpage.
@@ -49,6 +49,7 @@ def get_volume_and_issue_data_aea(url):
     Returns:
         volume_dict (dict): A dictionary mapping each volume to its issues and corresponding URLs.
     """
+
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
     base_url = "https://www.aeaweb.org"
@@ -93,6 +94,7 @@ def get_papers_link_aea(url, html_list, wait_time):
     Returns:
         html_list (list): Updated list with URLs of papers.
     """
+
     time.sleep(wait_time)
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
@@ -164,6 +166,7 @@ def _reformat_volume_issue(volume_issue):
     Returns:
         str: Reformatted volume and issue string, e.g., 'Volume 61, Issue 4'
     """
+
     # Splitting the string on spaces and removing any empty strings
     parts = [part for part in volume_issue.split() if part]
 

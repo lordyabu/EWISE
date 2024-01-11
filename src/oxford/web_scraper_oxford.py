@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 Web Scraper for Academic Journals - Oxford Module
 
@@ -9,17 +8,26 @@ authors, abstracts, and issue/volume details using Python, Selenium, and the Fir
 The tool is designed to assist in gathering data for academic research and analysis.
 
 Functions:
+    get_latest_volume_number_oxford(url, wait_time): Retrieves the latest volume number from a specified Oxford journal.
+    get_num_issues_oxford(name): Retrieves the number of issues available for a specified Oxford journal.
     get_papers_link_oxford(url, html_list, wait_time): Retrieves URLs of papers from a specified Oxford journal webpage.
-    get_abstract_info_oxford(url_paper_list, paper_number, wait_time): Extracts detailed information from a Oxford paper's webpage,
+    get_abstract_info_oxford(url_paper_list, paper_number, wait_time): Extracts detailed information from an Oxford paper's webpage,
         including abstract, title, authors, and issue/volume information.
 
 Usage:
-    1. Collect paper URLs:
+    1. Retrieve the latest volume number:
+        latest_volume_number = get_latest_volume_number_oxford(journal_url, wait_time)
+
+    2. Retrieve the number of issues:
+        num_issues = get_num_issues_oxford(journal_name)
+
+    3. Collect paper URLs:
         paper_urls = get_papers_link_oxford(journal_url, [], wait_time)
 
-    2. Extract paper details:
+    4. Extract paper details:
         paper_info = get_abstract_info_oxford(paper_urls, paper_index, wait_time)
 """
+
 
 # =============================================================================
 # Packages
@@ -38,6 +46,30 @@ import json
 # =============================================================================
 
 
+def get_num_issues_oxford(name):
+    """
+    Retrieves the number of issues for a specified Oxford journal.
+
+    Args:
+        name (str): The name of the Oxford journal.
+
+    Returns:
+        int or None: The number of issues if the journal is found, otherwise None.
+    """
+
+    try:
+        with open('oxford_name_to_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('oxford/oxford_name_to_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+
+    try:
+        return name_dict[name]
+    except KeyError:
+        print(f"The journal name: {name} either is not an Oxford journal or has not been added to name->num_issue dict.")
+
+
 def get_latest_volume_number_oxford(url, wait_time):
     """
     Retrieves the latest volume number from the specified webpage.
@@ -49,6 +81,7 @@ def get_latest_volume_number_oxford(url, wait_time):
     Returns:
         int: The latest volume number as an integer.
     """
+
     volume_number = 0
     try:
         service = Service(GECKO_PATH)
@@ -74,20 +107,6 @@ def get_latest_volume_number_oxford(url, wait_time):
     return volume_number
 
 
-def get_num_issues_oxford(name):
-    try:
-        with open('oxford_name_to_num_issues.json', 'r') as file:
-            name_dict = json.load(file)
-    except:
-        with open('oxford/oxford_name_to_num_issues.json', 'r') as file:
-            name_dict = json.load(file)
-
-    try:
-        return name_dict[name]
-    except KeyError:
-        print(f"The journal name: {name} either is not an Oxford journal or has not been added to name->num_issue dict.")
-
-
 def get_papers_link_oxford(url, html_list, wait_time):
     """
     Retrieves URLs of papers from a specified Oxford journal webpage.
@@ -99,6 +118,7 @@ def get_papers_link_oxford(url, html_list, wait_time):
     Returns:
         paper_links (list): List of URLs of papers.
     """
+
     # Initialize the browser
     service = Service(GECKO_PATH)
     browser = webdriver.Firefox(service=service)
@@ -136,7 +156,7 @@ def get_abstract_info_oxford(url_paper_list, paper_number, wait_time):
     Returns:
         paper (list): A list containing detailed information of the paper.
     """
-    paper = []
+
     try:
         service = Service(GECKO_PATH)
         browser = webdriver.Firefox(service=service)
