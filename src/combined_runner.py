@@ -3,24 +3,27 @@
 """
 Main Runner for Academic Journal Web Scrapers
 
-This script is designed to execute web scraping tasks for various academic journals.
-It leverages specific scraping modules for journals from Elsevier, Econometrica,
-the American Economic Association (AEA), and the University of Chicago. Each module
-is equipped to extract article details such as titles, authors, abstracts, and more,
-using Selenium and appropriate web drivers.
+This script is designed to facilitate web scraping tasks for a wide range of academic journals from multiple publishers including Elsevier, Econometrica, the American Economic Association (AEA), the University of Chicago, Oxford, Springer, and Wiley. Each module within the script is tailored to scrape specific journals from these publishers, extracting article details like titles, authors, abstracts, and more, utilizing Selenium and appropriate web drivers.
 
-The script allows selective execution of scraping tasks based on predefined flags.
+The script is flexible, allowing selective execution of scraping tasks for different journals from various publishers. This is managed through predefined flags that can be set for each publisher's set of journals.
 
 Modules:
     scrape_multiple_elsevier_journals: Handles scraping of multiple journals from Elsevier.
     scrape_multiple_aea_journals: Handles scraping of multiple journals from the AEA.
-    scrape_uchicago_journal: Handles scraping of a journal from the University of Chicago.
+    scrape_multiple_uchicago_journals: Handles scraping of multiple journals from the University of Chicago.
+    scrape_multiple_oxford_journals: Handles scraping of multiple journals from Oxford.
+    scrape_multiple_springer_journals: Handles scraping of multiple journals from Springer.
+    scrape_multiple_wiley_journals: Handles scraping of multiple journals from Wiley.
 
 Usage:
-    Set the respective flags for Elsevier, Econometrica, AEA, and UChicago journals to True to enable scraping.
-    Configure the volume and issue numbers for each set of journals to scrape.
+    Set the respective flags for Elsevier, AEA, UChicago, Oxford, Springer, and Wiley journals to True to enable their scraping.
+    Configure the # of previous volumes wanted
     Run this script to initiate the scraping process for the enabled journals.
+
+Note:
+    The wait times and the number of previous volumes to scrape can be adjusted for each publisher's set of journals.
 """
+
 
 from src.elsevier.elsevier_runner import scrape_multiple_elsevier_journals
 from src.uchicago.uchicago_runner import scrape_multiple_uchicago_journals
