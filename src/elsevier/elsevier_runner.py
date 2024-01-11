@@ -1,27 +1,27 @@
 # -*- coding: utf-8 -*-
 
-# =============================================================================
-# Elsevier Journal Web Scraper
-# =============================================================================
 """
-This module provides automated tools for scraping academic articles from
-Elsevier journals. It extracts details like article titles, authors, abstracts,
-and issue/volume information using Selenium with GeckoDriver for web scraping.
-The scraped data is saved in JSON format.
+Elsevier Journal Web Scraper
+
+This module provides automated tools for scraping academic articles from Elsevier journals. It extracts article details such as titles,
+authors, abstracts, and issue/volume information using Python, Selenium, and the GeckoDriver for web scraping. The scraped data is saved
+in JSON format. Two main functions allow for either manual or automatic scraping of journal articles.
 
 Functions:
-    scrape_elsevier_journal(journal_name, volumes, issues): Main function to scrape
-        articles from a specified Elsevier journal.
-    scrape_multiple_elsevier_journals(journal_list, volumes, issues): Scrapes multiple
-        journals based on the given list of journal names.
+    automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time): Automatically scrapes articles from a specified Elsevier journal.
+    manual_scrape_elsevier_journal(name, volumes, issues, wait_time): Manually scrapes articles from a specified Elsevier journal based on provided volumes and issues.
+    scrape_multiple_elsevier_journals(journal_list, num_prev_vols, wait_time): Scrapes multiple journals based on a provided list of journal names.
 
 Usage:
-    To scrape a single journal:
-        scrape_elsevier_journal('journal-name', [volume_numbers], [issue_numbers])
+    To scrape a single journal automatically:
+        automatic_scrape_elsevier_journal('journal-name', num_prev_vols, wait_time)
 
-    To scrape multiple journals:
+    To scrape a single journal manually:
+        manual_scrape_elsevier_journal('journal-name', [volume_numbers], [issue_numbers], wait_time)
+
+    To scrape multiple journals automatically:
         journal_list = ['journal1', 'journal2', ...]
-        scrape_multiple_elsevier_journals(journal_list, [volume_numbers], [issue_numbers])
+        scrape_multiple_elsevier_journals(journal_list, num_prev_vols, wait_time)
 """
 
 # =============================================================================
@@ -33,21 +33,32 @@ import os.path
 import sys
 import json
 from tqdm import tqdm
-from config import USER_PATH, DATA_PATH
 
 # Developed Modules
+from config import USER_PATH, DATA_PATH
 sys.path.append(os.path.join(USER_PATH, 'src'))
-from src.elsevier.web_scrapper_elsevier import get_papers_link_elsevier, get_abstract_info_elsevier, get_num_issues_elsevier, get_latest_volume_elsevier
+from src.elsevier.web_scrapper_elsevier import get_papers_link_elsevier, get_abstract_info_elsevier, \
+    get_num_issues_elsevier, get_latest_volume_elsevier
 
 
 # =============================================================================
-# Scraper/Saver
+# Scraper/Savers
 # =============================================================================
-
 
 def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
+    """
+    Automatically scrapes articles from a specified Elsevier journal.
+
+    Args:
+        name (str): The name of the Elsevier journal.
+        num_prev_vols (int): The number of previous volumes to scrape.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        None: Saves the scraped data as a JSON file.
+    """
+
     output_path = os.path.join(DATA_PATH, f'elsevier_{name}.json')
-    volume_url = f"https://www.sciencedirect.com/journal/{name}/issues"
     journal_url = 'https://www.sciencedirect.com/journal/{}/vol/{{}}/suppl/C'.format(name)
     journal_multiple_issue_url = 'https://www.sciencedirect.com/journal/{}/vol/{{}}/issue/{{}}'.format(name)
 
@@ -64,7 +75,6 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
         issues = [i for i in range(1, num_issues + 1)]
     else:
         issues = None
-
 
     # Generate URLs
     try:
@@ -96,7 +106,22 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
+
 def manual_scrape_elsevier_journal(name, volumes, issues, wait_time):
+    """
+    Manually scrapes articles from a specified Elsevier journal based on provided volumes and issues.
+
+    Args:
+        name (str): The name of the Elsevier journal.
+        volumes (list of int): Volumes to scrape.
+        issues (list of int): Issues to scrape within each volume.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        None: Saves the scraped data as a JSON file.
+    """
+
     output_path = os.path.join(DATA_PATH, f'elsevier_{name}.json')
     journal_url = 'https://www.sciencedirect.com/journal/{}/vol/{{}}/suppl/C'.format(name)
 

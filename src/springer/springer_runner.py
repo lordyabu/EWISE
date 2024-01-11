@@ -1,24 +1,47 @@
-from src.springer.web_scraper_springer import get_latest_volume_number_springer, get_num_issues_springer, get_paper_number_from_name_springer, get_papers_link_springer, get_abstract_info_springer
+# -*- coding: utf-8 -*-
+
+"""
+Springer Journal Web Scraper
+
+This module provides automated tools for scraping academic articles from Springer journals. It extracts details such as article titles,
+authors, abstracts, and issue/volume information using Selenium with GeckoDriver for web scraping. The scraped data is saved in JSON format.
+The module includes functions for both manual and automatic scraping of articles from specified journals.
+
+Functions:
+    automatic_scrape_springer_journal(name, num_prev_vols, wait_time): Automatically scrapes articles from a specified Springer journal.
+    manual_scrape_springer_journals(name, volumes, issues, wait_time): Manually scrapes articles from a specified Springer journal based on provided volumes and issues.
+    scrape_multiple_springer_journals(journal_list, num_prev_vols, wait_time): Scrapes multiple Springer journals based on a provided list of journal names.
+
+Usage:
+    To scrape a single journal automatically:
+        automatic_scrape_springer_journal('journal-name', num_prev_vols, wait_time)
+
+    To scrape a single journal manually:
+        manual_scrape_springer_journals('journal-name', [volume_numbers], [issue_numbers], wait_time)
+
+    To scrape multiple journals automatically:
+        journal_list = ['journal1', 'journal2', ...]
+        scrape_multiple_springer_journals(journal_list, num_prev_vols, wait_time)
+"""
+
+# =============================================================================
+# Packages
+# =============================================================================
+
+# General Modules
 from tqdm import tqdm
 import json
 import os.path
+
+# Developed Modules
 from config import USER_PATH, DATA_PATH
+from src.springer.web_scraper_springer import get_latest_volume_number_springer, get_num_issues_springer, \
+    get_paper_number_from_name_springer, get_papers_link_springer, get_abstract_info_springer
 
 
-def scrape_multiple_springer_journals(journal_list, num_prev_vols, wait_time):
-    for name in journal_list:
-        try:
-            automatic_scrape_springer_journal(name, num_prev_vols, wait_time)
-        except Exception as e:
-            print(e)
-
-
-def scrape_springer_journal(name, automatic_collection, num_prev_vols, manual_vols=-1, manual_issues=-1, wait_time=15):
-    if automatic_collection:
-        automatic_scrape_springer_journal(name, num_prev_vols, wait_time)
-    else:
-        manual_scrape_springer_journals(name, manual_vols, manual_issues, wait_time)
-
+# =============================================================================
+# Scraper/Savers
+# =============================================================================
 
 def automatic_scrape_springer_journal(name, num_prev_vols, wait_time):
     int_paper = get_paper_number_from_name_springer(name)
@@ -111,9 +134,25 @@ def manual_scrape_springer_journals(name, volumes, issues, wait_time):
         json.dump(abstract_list, json_file)
 
 
+# =============================================================================
+# Run Multiple
+# =============================================================================
+def scrape_multiple_springer_journals(journal_list, num_prev_vols, wait_time):
+    for name in journal_list:
+        try:
+            automatic_scrape_springer_journal(name, num_prev_vols, wait_time)
+        except Exception as e:
+            print(e)
+
+
+# =============================================================================
+# Main
+# =============================================================================
 def main():
-    journal_list = ['IMF Economic Review', 'Journal of Economic Growth', 'Journal of Risk and Uncertainty', 'Journal of Population Economics', 'Economic Theory', 'Public Choice', 'Empirical Economics']
+    journal_list = ['IMF Economic Review', 'Journal of Economic Growth', 'Journal of Risk and Uncertainty',
+                    'Journal of Population Economics', 'Economic Theory', 'Public Choice', 'Empirical Economics']
     scrape_multiple_springer_journals(journal_list, 1, 15)
+
 
 if __name__ == "__main__":
     main()

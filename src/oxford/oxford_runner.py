@@ -1,27 +1,63 @@
-from src.oxford.web_scraper_oxford import get_papers_link_oxford, get_abstract_info_oxford, get_latest_volume_number_oxford, \
-    get_num_issues_oxford
-from tqdm import tqdm
-import json
+# -*- coding: utf-8 -*-
+
+"""
+Oxford Journal Web Scraper
+
+This module provides automated tools for scraping academic articles from Oxford journals. It extracts details such as article titles,
+authors, abstracts, and issue/volume information using Selenium with GeckoDriver for web scraping. The scraped data is saved in JSON format.
+The module includes functions for both manual and automatic scraping of articles from specified journals.
+
+Functions:
+    automatic_scrape_oxford_journal(name, num_prev_vols, wait_time): Automatically scrapes articles from a specified Oxford journal.
+    manual_scrape_oxford_journals(name, volumes, issues, wait_time): Manually scrapes articles from a specified Oxford journal based on provided volumes and issues.
+    scrape_multiple_oxford_journals(journal_list, num_prev_vols, wait_time): Scrapes multiple Oxford journals based on a provided list of journal names.
+
+Usage:
+    To scrape a single journal automatically:
+        automatic_scrape_oxford_journal('journal-name', num_prev_vols, wait_time)
+
+    To scrape a single journal manually:
+        manual_scrape_oxford_journals('journal-name', [volume_numbers], [issue_numbers], wait_time)
+
+    To scrape multiple journals automatically:
+        journal_list = ['journal1', 'journal2', ...]
+        scrape_multiple_oxford_journals(journal_list, num_prev_vols, wait_time)
+"""
+
+# =============================================================================
+# Packages
+# =============================================================================
+
+# General Modules
 import os.path
+import sys
+import json
+from tqdm import tqdm
+
+# Developed Modules
 from config import USER_PATH, DATA_PATH
+sys.path.append(os.path.join(USER_PATH, 'src'))
+from src.oxford.web_scraper_oxford import get_papers_link_oxford, get_abstract_info_oxford, \
+    get_latest_volume_number_oxford, \
+    get_num_issues_oxford
 
 
-def scrape_multiple_oxford_journals(journal_list, num_prev_vols, wait_time):
-    for name in journal_list:
-        try:
-            automatic_scrape_oxford_journal(name, num_prev_vols, wait_time)
-        except Exception as e:
-            print(e)
-
-
-def scrape_oxford_journal(name, automatic_collection, num_prev_vols, manual_vols=-1, manual_issues=-1, wait_time=15):
-    if automatic_collection:
-        automatic_scrape_oxford_journal(name, num_prev_vols, wait_time)
-    else:
-        manual_scrape_oxford_journals(name, manual_vols, manual_issues, wait_time)
-
-
+# =============================================================================
+# Scraper/Savers
+# =============================================================================
 def automatic_scrape_oxford_journal(name, num_prev_vols, wait_time):
+    """
+    Automatically scrapes articles from a specified Oxford journal.
+
+    Args:
+        name (str): The name of the Oxford journal.
+        num_prev_vols (int): The number of previous volumes to scrape.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        None: Saves the scraped data as a JSON file.
+    """
+
     base_url = f"https://academic.oup.com/{name}"
     output_path = os.path.join(DATA_PATH, f'oxford_{name}.json')
     journal_url = "{}/issue/{{}}/{{}}".format(base_url)
@@ -76,6 +112,18 @@ def automatic_scrape_oxford_journal(name, num_prev_vols, wait_time):
 
 
 def manual_scrape_oxford_journals(name, volumes, issues, wait_time):
+    """
+    Manually scrapes articles from a specified Oxford journal based on provided volumes and issues.
+
+    Args:
+        name (str): The name of the Oxford journal.
+        volumes (list of int): Volumes to scrape.
+        issues (list of int): Issues to scrape within each volume.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        None: Saves the scraped data as a JSON file.
+    """
 
     if name == "ej":
         raise ValueError("The Economic Journal is not supported yet")
@@ -120,8 +168,35 @@ def manual_scrape_oxford_journals(name, volumes, issues, wait_time):
         json.dump(abstract_list, json_file)
 
 
+# =============================================================================
+# Run Multiple
+# =============================================================================
+def scrape_multiple_oxford_journals(journal_list, num_prev_vols, wait_time):
+    """
+    Scrapes multiple Oxford journals for academic articles.
+
+    Args:
+        journal_list (list of str): List of Oxford journal names to scrape.
+        num_prev_vols (int): Number of previous volumes to scrape for each journal.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        None: Saves the scraped data as JSON files for each journal.
+    """
+
+    for name in journal_list:
+        try:
+            automatic_scrape_oxford_journal(name, num_prev_vols, wait_time)
+        except Exception as e:
+            print(e)
+
+
+# =============================================================================
+# Main
+# =============================================================================
 def main():
-    journal_list = ["restud", "rfs", "jeea", "wber", "jleo", "rof", "jcr", "ectj", "joeg", "rcfs", "oep", "jfec", "raps"]
+    journal_list = ["restud", "rfs", "jeea", "wber", "jleo", "rof", "jcr", "ectj", "joeg", "rcfs", "oep", "jfec",
+                    "raps"]
 
     scrape_multiple_oxford_journals(journal_list, 1, 15)
 

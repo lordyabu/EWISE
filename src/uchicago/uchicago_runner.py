@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 
-# =============================================================================
-# UChicago Journal Web Scraper
-# =============================================================================
 """
+UChicago Journal Web Scraper
+
 This module provides a tool for web scraping academic journals published by the University of Chicago.
 It extracts article titles, authors, abstracts, and issue/volume information using Python, Selenium,
 and the Firefox web driver. The data is collected from journal webpages and saved in JSON format.
 
 Functions:
-    scrape_uchicago_journal(journal_name, volumes, issues): Scrapes articles from a specified
-        University of Chicago journal.
-    scrape_multiple_uchicago_journals(journal_list, volumes, issues): Scrapes multiple journals
-        based on the provided list of journal names.
+    automatic_scrape_uchicago_journal(name, num_prev_vols, wait_time): Automatically scrapes articles from a specified University of Chicago journal.
+    manual_scrape_uchicago_journal(name, volumes, issues, wait_time): Manually scrapes articles from a specified University of Chicago journal based on provided volumes and issues.
+    scrape_multiple_uchicago_journals(journal_list, num_prev_vols, wait_time): Scrapes multiple journals based on the provided list of journal names.
 
 Usage:
-    To scrape a single journal:
-        scrape_uchicago_journal('journal-name', [volume_numbers], [issue_numbers])
+    To scrape a single journal automatically:
+        automatic_scrape_uchicago_journal('journal-name', num_prev_vols, wait_time)
 
-    To scrape multiple journals:
+    To scrape a single journal manually:
+        manual_scrape_uchicago_journal('journal-name', [volume_numbers], [issue_numbers], wait_time)
+
+    To scrape multiple journals automatically:
         journal_list = ['journal1', 'journal2', ...]
-        scrape_multiple_uchicago_journals(journal_list, [volume_numbers], [issue_numbers])
+        scrape_multiple_uchicago_journals(journal_list, num_prev_vols, wait_time)
 """
 
 # =============================================================================
@@ -32,19 +33,31 @@ import os.path
 import sys
 import json
 from tqdm import tqdm
-from config import USER_PATH, DATA_PATH
 
 # Developed Modules
+from config import USER_PATH, DATA_PATH
 sys.path.append(os.path.join(USER_PATH, 'src'))
-from src.uchicago.web_scrapper_uchicago import get_papers_link_uchicago, get_abstract_info_uchicago, get_num_issues_uchicago, get_latest_volume_uchicago
+from src.uchicago.web_scrapper_uchicago import get_papers_link_uchicago, get_abstract_info_uchicago, \
+    get_num_issues_uchicago, get_latest_volume_uchicago
 
 
 # =============================================================================
-# Scraper/Saver
+# Scraper/Savers
 # =============================================================================
-
 
 def automatic_scrape_uchicago_journal(name, num_prev_vols, wait_time):
+    """
+    Automatically scrapes articles from a specified University of Chicago journal.
+
+    Args:
+        name (str): The name of the University of Chicago journal.
+        num_prev_vols (int): The number of previous volumes to scrape.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        None: Saves the scraped data as a JSON file.
+    """
+
     output_path = os.path.join(DATA_PATH, f'uchicago_{name}.json')
     journal_url = 'https://www.journals.uchicago.edu/toc/{}/{{}}/{{}}'.format(name)
 
@@ -89,17 +102,20 @@ def automatic_scrape_uchicago_journal(name, num_prev_vols, wait_time):
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
+
 def manual_scrape_uchicago_journal(name, volumes, issues, wait_time):
     """
-    Scrapes information from University of Chicago journal webpages and saves it in a JSON file.
+    Manually scrapes articles from a specified University of Chicago journal based on provided volumes and issues.
 
     Args:
-        journal_name (str): The name of the journal to scrape.
+        name (str): The name of the University of Chicago journal.
         volumes (list of int): Volumes to scrape.
-        issues (list of int or None): Issues to scrape within each volume.
+        issues (list of int): Issues to scrape within each volume.
+        wait_time (int): Time to wait for page rendering before scraping.
 
     Returns:
-        None: Saves the scraped data as a JSON file in the DATA_PATH directory.
+        None: Saves the scraped data as a JSON file.
     """
 
     output_path = os.path.join(DATA_PATH, f'uchicago_{name}.json')
@@ -174,7 +190,7 @@ def main():
 
     uchicago_journals = ['edcc', 'jole', 'jle', 'jpe', 'ntj', 'reep']
 
-    #manual_scrape_uchicago_journal(journal_name='jole', volumes=volumes, issues=issues)
+    # manual_scrape_uchicago_journal(journal_name='jole', volumes=volumes, issues=issues)
     scrape_multiple_uchicago_journals(uchicago_journals, 1, 15)
 
 

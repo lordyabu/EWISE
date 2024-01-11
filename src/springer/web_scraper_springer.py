@@ -17,11 +17,11 @@ Functions:
         including abstract, title, authors, and issue/volume information.
 
 Usage:
-    1. Retrieve the latest volume number:
-        latest_volume_number = get_latest_volume_number_springer(journal_url, wait_time)
-
-    2. Retrieve paper number from journal name:
+    1. Retrieve paper number from journal name:
         paper_number = get_paper_number_from_name_springer(journal_name)
+
+    2. Retrieve the latest volume number:
+        latest_volume_number = get_latest_volume_number_springer(journal_url, wait_time)
 
     3. Retrieve the number of issues:
         num_issues = get_num_issues_springer(journal_name)

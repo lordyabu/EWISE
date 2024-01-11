@@ -1,26 +1,27 @@
 # -*- coding: utf-8 -*-
 
-# =============================================================================
-# American Economic Association (AEA) Journal Web Scraper
-# =============================================================================
 """
-This module provides automated tools for scraping academic articles from AEA journals.
-It extracts article titles, authors, abstracts, and issue/volume information using Selenium
-with GeckoDriver. The scraped data is saved in JSON format.
+American Economic Association (AEA) Journal Web Scraper
+
+This module provides automated tools for scraping academic articles from AEA journals. It extracts article titles, authors, abstracts,
+and issue/volume information using Selenium with GeckoDriver for web scraping. The scraped data is saved in JSON format. The module
+includes functions for both manual and automatic scraping of articles from specified journals.
 
 Functions:
-    scrape_aea_journal(journal_name, volumes, issues, get_link_dicts=True): Main function
-        to scrape articles from a specified AEA journal.
-    scrape_multiple_aea_journals(journal_list, volumes, issues): Scrapes multiple journals
-        based on the given list of journal names.
+    automatic_scrape_aea_journal(name, num_prev_vols, wait_time): Automatically scrapes articles from a specified AEA journal.
+    manual_scrape_aea_journal(name, volumes, issues, wait_time): Manually scrapes articles from a specified AEA journal based on provided volumes and issues.
+    scrape_multiple_aea_journals(journal_list, num_prev_vols, wait_time): Scrapes multiple journals based on a provided list of journal names.
 
 Usage:
-    To scrape a single journal:
-        scrape_aea_journal('journal-name', [volume_numbers], [issue_numbers])
+    To scrape a single journal automatically:
+        automatic_scrape_aea_journal('journal-name', num_prev_vols, wait_time)
 
-    To scrape multiple journals:
+    To scrape a single journal manually:
+        manual_scrape_aea_journal('journal-name', [volume_numbers], [issue_numbers], wait_time)
+
+    To scrape multiple journals automatically:
         journal_list = ['journal1', 'journal2', ...]
-        scrape_multiple_aea_journals(journal_list, [volume_numbers], [issue_numbers])
+        scrape_multiple_aea_journals(journal_list, num_prev_vols, wait_time)
 """
 
 # =============================================================================
@@ -32,21 +33,32 @@ import os.path
 import sys
 import json
 from tqdm import tqdm
-from config import USER_PATH, DATA_PATH
-from src.helperFunctions.jsonHelpers import load_json_as_dict, save_dict_as_json
 
 # Developed Modules
+from config import USER_PATH, DATA_PATH
 sys.path.append(os.path.join(USER_PATH, 'src'))
 from src.americanEconomicAssociation.web_scraper_aea import get_papers_link_aea, get_abstract_info_aea, \
     get_volume_and_issue_data_aea
 
 
 # =============================================================================
-# Scraper/Saver
+# Scraper/Savers
 # =============================================================================
 
 
 def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
+    """
+    Automatically scrapes articles from a specified AEA journal.
+
+    Args:
+        name (str): The name of the AEA journal.
+        num_prev_vols (int): The number of previous volumes to scrape.
+        wait_time (int): Time to wait for page rendering before scraping.
+
+    Returns:
+        None: Saves the scraped data as a JSON file.
+    """
+
     journal_url = f'https://www.aeaweb.org/journals/{name}/issues'
 
     output_path = os.path.join(DATA_PATH, f'aea_{name}.json')
@@ -94,12 +106,13 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
 
 def manual_scrape_aea_journal(name, volumes, issues, wait_time):
     """
-    Scrapes a specified Elsevier journal for academic articles.
+    Manually scrapes articles from a specified AEA journal based on provided volumes and issues.
 
     Args:
-        journal_name (str): The name of the journal.
+        name (str): The name of the AEA journal.
         volumes (list of int): Volumes to scrape.
         issues (list of int): Issues to scrape within each volume.
+        wait_time (int): Time to wait for page rendering before scraping.
 
     Returns:
         None: Saves the scraped data as a JSON file.
@@ -159,6 +172,7 @@ def scrape_multiple_aea_journals(journal_list, num_prev_vols, wait_time):
     Returns:
         None: Saves the scraped data as JSON files for each journal.
     """
+
     for journal_name in journal_list:
         print(f"Starting {journal_name}")
         try:
