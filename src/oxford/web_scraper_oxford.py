@@ -75,8 +75,12 @@ def get_latest_volume_number_oxford(url, wait_time):
 
 
 def get_num_issues_oxford(name):
-    with open('oxford_name_to_num_issues.json', 'r') as file:
-        name_dict = json.load(file)
+    try:
+        with open('oxford_name_to_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('oxford/oxford_name_to_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
 
     try:
         return name_dict[name]

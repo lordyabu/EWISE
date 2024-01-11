@@ -85,15 +85,10 @@ def scrape_econometrica_journal(volumes, issues):
             if abstract:
                 abstract_list.append(abstract)
 
-                #ToDo remove
-                print(abstract)
-                return None
-
         except Exception as e:
             pass
 
     # Write data to JSON file
-    # ToDo uncomment
     # with open(output_path, 'w') as json_file:
     #     json.dump(abstract_list, json_file)
 

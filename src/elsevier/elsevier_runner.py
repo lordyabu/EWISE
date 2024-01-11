@@ -81,21 +81,15 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
     for site in tqdm(url, desc="Getting paper links"):
         try:
             html_list = get_papers_link_elsevier(site, html_list, wait_time)
-
-            #ToDo remove
-            if len(html_list) > 3:
-                break
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
-
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
             abstract = get_abstract_info_elsevier(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
             if abstract:
                 abstract_list.append(abstract)
-                # ToDo remove
-                break
+
         except Exception as e:
             pass
 
@@ -184,11 +178,10 @@ def main():
                     'review-of-economic-dynamics', 'journal-of-banking-and-finance', 'energy-economics',
                     'journal-of-urban-economics', 'games-and-economic-behavior', 'world-development',
                     'economics-letters', 'labour-economics', 'journal-of-corporate-finance', 'ecological-economics',
-                    'european-journal-of-political-economy']
+                    'european-journal-of-political-economy', 'international-economics', 'economics-of-education-review',
+                    'international-journal-of-forecasting']
     # volumes = [70]
     # issues = [0]
-
-    journal_list = ['journal-of-financial-economics', 'economia', 'journal-of-accounting-and-economics', 'asia-and-the-global-economy', 'journal-of-econometrics']
 
     # scrape_elsevier_journal('journal-of-empirical-finance', volumes, issues)
     scrape_multiple_elsevier_journals(journal_list=journal_list, num_prev_vols=1, wait_time=15)

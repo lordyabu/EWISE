@@ -86,8 +86,12 @@ def get_latest_volume_number_springer(url, wait_time):
 
 #DONE
 def get_paper_number_from_name_springer(name):
-    with open('springer_journal_name_to_int_and_num_issues.json', 'r') as file:
-        name_dict = json.load(file)
+    try:
+        with open('springer_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('springer/springer_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
 
     try:
         return name_dict[name][0]
@@ -97,8 +101,12 @@ def get_paper_number_from_name_springer(name):
 
 #DONE
 def get_num_issues_springer(name):
-    with open('springer_journal_name_to_int_and_num_issues.json', 'r') as file:
-        name_dict = json.load(file)
+    try:
+        with open('springer_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('springer/springer_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
 
     try:
         return name_dict[name][1]

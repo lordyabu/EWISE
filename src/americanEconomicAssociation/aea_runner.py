@@ -53,6 +53,9 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
 
     aea_dict = get_volume_and_issue_data_aea(journal_url)
 
+    if len(aea_dict.keys()) == 0:
+        raise KeyError(f"Journal {name} does not have any data")
+
     html_list = []
     abstract_list = []
     url = []
@@ -72,9 +75,6 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
     for site in tqdm(url, desc="Getting paper links"):
         try:
             html_list = get_papers_link_aea(site, html_list, wait_time)
-            #ToDo remove
-            if len(html_list) > 3:
-                break
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
 
@@ -84,8 +84,6 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
             abstract = get_abstract_info_aea(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
             if abstract:
                 abstract_list.append(abstract)
-                # ToDo remove
-                break
         except Exception as e:
             pass
 
@@ -129,9 +127,6 @@ def manual_scrape_aea_journal(name, volumes, issues, wait_time):
     for site in tqdm(url, desc="Getting paper links"):
         try:
             html_list = get_papers_link_aea(site, html_list, wait_time)
-            #ToDo remove
-            if len(html_list) > 3:
-                break
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
 
@@ -141,8 +136,6 @@ def manual_scrape_aea_journal(name, volumes, issues, wait_time):
             abstract = get_abstract_info_aea(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
             if abstract:
                 abstract_list.append(abstract)
-                # ToDo remove
-                break
         except Exception as e:
             pass
 
@@ -154,7 +147,7 @@ def manual_scrape_aea_journal(name, volumes, issues, wait_time):
 # =============================================================================
 # Run Multiple
 # =============================================================================
-def scrape_multiple_aea_journals(journal_list, volumes, issues):
+def scrape_multiple_aea_journals(journal_list, num_prev_vols, wait_time):
     """
     Scrapes multiple AEA journals for academic articles.
 
@@ -169,7 +162,7 @@ def scrape_multiple_aea_journals(journal_list, volumes, issues):
     for journal_name in journal_list:
         print(f"Starting {journal_name}")
         try:
-            automatic_scrape_aea_journal(journal_name, num_prev_vols=1, wait_time=30)
+            automatic_scrape_aea_journal(journal_name, num_prev_vols, wait_time)
         except Exception as e:
             print(e)
 
@@ -178,13 +171,13 @@ def scrape_multiple_aea_journals(journal_list, volumes, issues):
 # Main
 # =============================================================================
 def main():
-    volumes = [61]
-    issues = [4]
+    # volumes = [61]
+    # issues = [4]
 
-    aea_journals = ['mac', 'aeri', 'pol', 'app', 'mic', 'jep']
+    aea_journals = ['jel', 'mac', 'aeri', 'pol', 'app', 'mic', 'jep', 'aer']
 
     # scrape_aea_journal(journal_name='jel', volumes=volumes, issues=issues, get_link_dicts=False)
-    scrape_multiple_aea_journals(aea_journals, volumes, issues)
+    scrape_multiple_aea_journals(aea_journals, 1, 30)
 
 
 if __name__ == "__main__":

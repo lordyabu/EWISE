@@ -40,8 +40,12 @@ import json
 
 
 def get_num_issues_elsevier(name):
-    with open('elsevier_journals_with_issues.json', 'r') as file:
-        name_dict = json.load(file)
+    try:
+        with open('elsevier_journals_with_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('elsevier/elsevier_journals_with_issues.json', 'r') as file:
+            name_dict = json.load(file)
 
     try:
         return name_dict[name]

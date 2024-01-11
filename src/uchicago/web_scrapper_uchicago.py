@@ -41,8 +41,12 @@ import json
 
 
 def get_num_issues_uchicago(name):
-    with open('uchicago_journal_name_to_num_issues.json', 'r') as file:
-        name_dict = json.load(file)
+    try:
+        with open('uchicago_journal_name_to_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('uchicago/uchicago_journal_name_to_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
 
     try:
         return name_dict[name]

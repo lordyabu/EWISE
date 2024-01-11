@@ -74,9 +74,6 @@ def automatic_scrape_uchicago_journal(name, num_prev_vols, wait_time):
     for site in tqdm(url, desc="Getting paper links"):
         try:
             html_list = get_papers_link_uchicago(site, html_list, wait_time)
-            #ToDo remove
-            if len(html_list) > 3:
-                break
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
 
@@ -86,8 +83,6 @@ def automatic_scrape_uchicago_journal(name, num_prev_vols, wait_time):
             abstract = get_abstract_info_uchicago(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
             if abstract:
                 abstract_list.append(abstract)
-                # ToDo remove
-                break
         except Exception as e:
             pass
 

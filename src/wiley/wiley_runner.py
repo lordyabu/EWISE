@@ -1,12 +1,12 @@
-from web_scrapper_wiley import get_latest_volume_number_wiley, get_num_issues_wiley, get_paper_number_from_name_wiley, get_papers_link_wiley, get_abstract_info_wiley
+from src.wiley.web_scrapper_wiley import get_latest_volume_number_wiley, get_num_issues_wiley, get_paper_number_from_name_wiley, get_papers_link_wiley, get_abstract_info_wiley
 from tqdm import tqdm
 import json
 import os.path
 from config import USER_PATH, DATA_PATH
 
 
-def scrape_multiple_wiley_journals(names, num_prev_vols, wait_time):
-    for name in names:
+def scrape_multiple_wiley_journals(journal_list, num_prev_vols, wait_time):
+    for name in journal_list:
         try:
             automatic_scrape_wiley_journal(name, num_prev_vols, wait_time)
         except Exception as e:

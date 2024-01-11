@@ -1,4 +1,4 @@
-from web_scraper_oxford import get_papers_link_oxford, get_abstract_info_oxford, get_latest_volume_number_oxford, \
+from src.oxford.web_scraper_oxford import get_papers_link_oxford, get_abstract_info_oxford, get_latest_volume_number_oxford, \
     get_num_issues_oxford
 from tqdm import tqdm
 import json
@@ -6,8 +6,8 @@ import os.path
 from config import USER_PATH, DATA_PATH
 
 
-def scrape_multiple_oxford_journals(names, num_prev_vols, wait_time):
-    for name in names:
+def scrape_multiple_oxford_journals(journal_list, num_prev_vols, wait_time):
+    for name in journal_list:
         try:
             automatic_scrape_oxford_journal(name, num_prev_vols, wait_time)
         except Exception as e:
@@ -58,9 +58,6 @@ def automatic_scrape_oxford_journal(name, num_prev_vols, wait_time):
     for site in tqdm(url, desc="Getting paper links"):
         try:
             html_list = get_papers_link_oxford(site, html_list, wait_time)
-            # ToDo remove
-            if len(html_list) > 3:
-                break
         except Exception as e:
             raise RuntimeError(f"Failed to get links for each paper: {e}")
 
@@ -68,10 +65,8 @@ def automatic_scrape_oxford_journal(name, num_prev_vols, wait_time):
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
             abstract = get_abstract_info_oxford(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
-            # ToDo remove
             if abstract:
                 abstract_list.append(abstract)
-                break
         except Exception as e:
             pass
 
@@ -126,7 +121,7 @@ def manual_scrape_oxford_journals(name, volumes, issues, wait_time):
 
 
 def main():
-    journal_list = ["restud"]
+    journal_list = ["restud", "rfs", "jeea", "wber", "jleo", "rof", "jcr", "ectj", "joeg", "rcfs", "oep", "jfec", "raps"]
 
     scrape_multiple_oxford_journals(journal_list, 1, 15)
 

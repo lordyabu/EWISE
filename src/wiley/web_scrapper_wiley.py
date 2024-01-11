@@ -78,8 +78,12 @@ def get_latest_volume_number_wiley(url, wait_time):
     return volume_number
 
 def get_paper_number_from_name_wiley(name):
-    with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
-        name_dict = json.load(file)
+    try:
+        with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('wiley/wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
 
     try:
         return name_dict[name][0]
@@ -88,8 +92,12 @@ def get_paper_number_from_name_wiley(name):
 
 
 def get_num_issues_wiley(name):
-    with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
-        name_dict = json.load(file)
+    try:
+        with open('wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('wiley/wiley_journal_name_to_int_and_num_issues.json', 'r') as file:
+            name_dict = json.load(file)
 
     try:
         return name_dict[name][1]
@@ -145,7 +153,6 @@ def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):
     Returns:
         paper (list): A list containing detailed information of the paper.
     """
-    paper = []
     try:
         service = Service(GECKO_PATH)
         browser = webdriver.Firefox(service=service)
