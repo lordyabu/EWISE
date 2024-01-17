@@ -94,7 +94,10 @@ def get_latest_volume_elsevier(journal_name):
         volume_match = re.search(r"Volume (\d+)", volume_text)
         if volume_match:
             volume = volume_match.group(1)
+            browser.close()
             return volume
+
+    browser.close()
 
 
 def get_papers_link_elsevier(url, html_list, wait_time):

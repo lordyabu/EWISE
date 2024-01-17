@@ -42,16 +42,30 @@ import json
 
 def get_num_issues_uchicago(name):
     try:
-        with open('uchicago_journal_name_to_num_issues.json', 'r') as file:
+        with open('uchicago_journal_name_to_num_issues_and_full_name.json', 'r') as file:
             name_dict = json.load(file)
     except:
-        with open('uchicago/uchicago_journal_name_to_num_issues.json', 'r') as file:
+        with open('uchicago/uchicago_journal_name_to_num_issues_and_full_name.json', 'r') as file:
             name_dict = json.load(file)
 
     try:
-        return name_dict[name]
+        return name_dict[name][0]
     except KeyError:
-        print(f"The journal name: {name} either is not a UChicago journal or has not been added to name->#issues dict.")
+        print(f"The journal name: {name} either is not a UChicago journal or has not been added to name->#issues dict, fullname.")
+
+def get_full_name_uchicago(name):
+    try:
+        with open('uchicago_journal_name_to_num_issues_and_full_name.json', 'r') as file:
+            name_dict = json.load(file)
+    except:
+        with open('uchicago/uchicago_journal_name_to_num_issues_and_full_name.json', 'r') as file:
+            name_dict = json.load(file)
+
+    try:
+        return name_dict[name][1]
+    except KeyError:
+        print(
+            f"The journal name: {name} either is not a UChicago journal or has not been added to name->#issues dict.")
 
 
 def get_latest_volume_uchicago(journal_name):

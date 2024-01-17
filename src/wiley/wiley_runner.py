@@ -30,12 +30,13 @@ Usage:
 from tqdm import tqdm
 import json
 import os.path
+import pandas as pd
 
 # Developed Modules
 from config import USER_PATH, DATA_PATH
 from src.wiley.web_scrapper_wiley import get_latest_volume_number_wiley, get_num_issues_wiley, \
     get_paper_number_from_name_wiley, get_papers_link_wiley, get_abstract_info_wiley
-
+from src.helperFunctions.saving_to_dfs import process_file
 
 # =============================================================================
 # Scraper/Saver Functions
@@ -59,6 +60,8 @@ def automatic_scrape_wiley_journal(name, num_prev_vols, wait_time):
     volume_url = f"https://onlinelibrary.wiley.com/journal/{int_paper}"
     journal_url = "https://onlinelibrary.wiley.com/toc/{}/{{}}/{{}}".format(int_paper)
     output_path = os.path.join(DATA_PATH, f'wiley_{name}.json')
+    output_path_solo_df = os.path.join(DATA_PATH, f'wiley_df.csv')
+    output_path_total_df = os.path.join(DATA_PATH, f'all_df.csv')
 
     html_list = []
     abstract_list = []
@@ -94,12 +97,28 @@ def automatic_scrape_wiley_journal(name, num_prev_vols, wait_time):
             abstract = get_abstract_info_wiley(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
             if abstract:
                 abstract_list.append(abstract)
+
+
         except Exception as e:
             pass
 
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
+
+    # Convert to DataFrame
+    df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])
+    df[['Title', 'Authors', 'Abstract']] = pd.DataFrame(df['Details'].tolist(), index=df.index)
+    df.drop(columns=['Details'], inplace=True)
+
+    df.insert(0, 'Journal_Website', 'Wiley')
+    df.insert(1, 'Journal_Name', name)
+
+    columns = ['Journal_Website', 'Journal_Name', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
+
+    process_file(output_path_solo_df, df, columns)
+    process_file(output_path_total_df, df, columns)
 
 
 def manual_scrape_wiley_journals(name, volumes, issues, wait_time):
@@ -115,7 +134,7 @@ def manual_scrape_wiley_journals(name, volumes, issues, wait_time):
     Returns:
         None: Saves the scraped data as a JSON file.
     """
-    
+
     int_paper = get_paper_number_from_name_wiley(name)
     journal_url = "https://onlinelibrary.wiley.com/toc/{}/{{}}/{{}}".format(int_paper)
     output_path = os.path.join(DATA_PATH, f'wiley_{name}.json')
@@ -154,6 +173,21 @@ def manual_scrape_wiley_journals(name, volumes, issues, wait_time):
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
+    # #ToDo add saving in XLSX
+    #
+    # # Convert to DataFrame
+    # df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])
+    # df[['Title', 'Authors', 'Abstract']] = pd.DataFrame(df['Details'].tolist(), index=df.index)
+    # df.drop(columns=['Details'], inplace=True)
+    #
+    #
+    # df['Journal_Website'] = 'Wiley'
+    # df['Journal_Name'] = name
+    #
+    # process_file(output_path_solo_df, df)
+    # process_file(output_path_total_df, df)
+
 
 # =============================================================================
 # Run Multiple

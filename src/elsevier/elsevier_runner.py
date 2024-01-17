@@ -31,6 +31,7 @@ Usage:
 # General Modules
 import os.path
 import sys
+import pandas as pd
 import json
 from tqdm import tqdm
 
@@ -39,7 +40,7 @@ from config import USER_PATH, DATA_PATH
 sys.path.append(os.path.join(USER_PATH, 'src'))
 from src.elsevier.web_scrapper_elsevier import get_papers_link_elsevier, get_abstract_info_elsevier, \
     get_num_issues_elsevier, get_latest_volume_elsevier
-
+from src.helperFunctions.saving_to_dfs import process_file
 
 # =============================================================================
 # Scraper/Savers
@@ -58,7 +59,10 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
         None: Saves the scraped data as a JSON file.
     """
 
-    output_path = os.path.join(DATA_PATH, f'elsevier_{name}.json')
+    output_path = os.path.join(DATA_PATH, f'elsevier_{name}.csv')
+    output_path_solo_df = os.path.join(DATA_PATH, f'elsevier_df.csv')
+    output_path_total_df = os.path.join(DATA_PATH, f'all_df.csv')
+
     journal_url = 'https://www.sciencedirect.com/journal/{}/vol/{{}}/suppl/C'.format(name)
     journal_multiple_issue_url = 'https://www.sciencedirect.com/journal/{}/vol/{{}}/issue/{{}}'.format(name)
 
@@ -100,12 +104,27 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
             if abstract:
                 abstract_list.append(abstract)
 
+
         except Exception as e:
             pass
 
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
+
+    # Convert to DataFrame
+    df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])
+    df[['Title', 'Authors', 'Abstract']] = pd.DataFrame(df['Details'].tolist(), index=df.index)
+    df.drop(columns=['Details'], inplace=True)
+
+    df.insert(0, 'Journal_Website', 'Elsevier')
+    df.insert(1, 'Journal_Name', name)
+
+    columns = ['Journal_Website', 'Journal_Name', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
+
+    process_file(output_path_solo_df, df, columns)
+    process_file(output_path_total_df, df, columns)
 
 
 def manual_scrape_elsevier_journal(name, volumes, issues, wait_time):
@@ -159,6 +178,8 @@ def manual_scrape_elsevier_journal(name, volumes, issues, wait_time):
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
+    #ToDo add saving in XLSX
 
 
 # =============================================================================

@@ -32,9 +32,9 @@ from src.oxford.oxford_runner import scrape_multiple_oxford_journals
 from src.springer.springer_runner import scrape_multiple_springer_journals
 from src.wiley.wiley_runner import scrape_multiple_wiley_journals
 def main():
-    run_elsevier = True
+    run_elsevier = False
     run_aea = False
-    run_uchicago = False
+    run_uchicago = True
     run_oxford = False
     run_springer = False
     run_wiley = False
@@ -70,6 +70,8 @@ def main():
                         'economics-of-education-review',
                         'international-journal-of-forecasting']
 
+        # elsevier_journals = ['journal-of-empirical-finance']
+
         scrape_multiple_elsevier_journals(journal_list=elsevier_journals, num_prev_vols=num_prev_vols, wait_time=elsevier_wait_time)
 
 
@@ -80,6 +82,9 @@ def main():
 
     if run_uchicago:
         uchicago_journals = ['edcc', 'jole', 'jle', 'jpe', 'ntj', 'reep']
+
+        # uchicago_journals = ['jole']
+
 
         scrape_multiple_uchicago_journals(journal_list=uchicago_journals, num_prev_vols=num_prev_vols, wait_time=uchicago_wait_time)
 
@@ -115,6 +120,8 @@ def main():
                         'Economics and Politics',
                         'Canadian Journal of Economics',
                         'Journal of Forecasting']
+
+        # wiley_journals = ['The Journal of Finance']
 
         scrape_multiple_wiley_journals(journal_list=wiley_journals, num_prev_vols=num_prev_vols, wait_time=wiley_wait_time)
 

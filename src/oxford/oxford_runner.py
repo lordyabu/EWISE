@@ -110,6 +110,7 @@ def automatic_scrape_oxford_journal(name, num_prev_vols, wait_time):
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
 
+    #ToDo add saving in XLSX
 
 def manual_scrape_oxford_journals(name, volumes, issues, wait_time):
     """
@@ -166,6 +167,8 @@ def manual_scrape_oxford_journals(name, volumes, issues, wait_time):
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
+    #ToDo add saving in XLSX
 
 
 # =============================================================================

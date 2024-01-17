@@ -92,6 +92,8 @@ def automatic_scrape_springer_journal(name, num_prev_vols, wait_time):
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
 
+    #ToDo add saving in XLSX
+
 
 def manual_scrape_springer_journals(name, volumes, issues, wait_time):
     int_paper = get_paper_number_from_name_springer(name)
@@ -132,6 +134,8 @@ def manual_scrape_springer_journals(name, volumes, issues, wait_time):
     # Write data to JSON file
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
+
+    #ToDo add saving in XLSX
 
 
 # =============================================================================

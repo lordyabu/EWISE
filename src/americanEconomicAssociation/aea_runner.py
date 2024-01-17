@@ -103,6 +103,8 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
 
+    #ToDo add saving in XLSX
+
 
 def manual_scrape_aea_journal(name, volumes, issues, wait_time):
     """
@@ -156,6 +158,7 @@ def manual_scrape_aea_journal(name, volumes, issues, wait_time):
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
 
+    #ToDo add saving in XLSX
 
 # =============================================================================
 # Run Multiple
