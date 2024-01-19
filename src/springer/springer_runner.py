@@ -32,12 +32,13 @@ Usage:
 from tqdm import tqdm
 import json
 import os.path
+import pandas as pd
 
 # Developed Modules
 from config import USER_PATH, DATA_PATH
 from src.springer.web_scraper_springer import get_latest_volume_number_springer, get_num_issues_springer, \
     get_paper_number_from_name_springer, get_papers_link_springer, get_abstract_info_springer
-
+from src.helperFunctions.saving_to_dfs import process_file
 
 # =============================================================================
 # Scraper/Savers
@@ -48,6 +49,8 @@ def automatic_scrape_springer_journal(name, num_prev_vols, wait_time):
     volume_url = f"https://link.springer.com/journal/{int_paper}/volumes-and-issues"
     journal_url = "https://link.springer.com/journal/{}/volumes-and-issues/{{}}-{{}}".format(int_paper)
     output_path = os.path.join(DATA_PATH, f'springer_{name}.json')
+    output_path_solo_df = os.path.join(DATA_PATH, f'springer_df.csv')
+    output_path_total_df = os.path.join(DATA_PATH, f'all_df.csv')
 
     html_list = []
     abstract_list = []
@@ -92,7 +95,20 @@ def automatic_scrape_springer_journal(name, num_prev_vols, wait_time):
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
 
-    #ToDo add saving in XLSX
+    #ToDo add UNIQUE KEY
+
+    # Convert to DataFrame
+    df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])
+    df[['Title', 'Authors', 'Abstract']] = pd.DataFrame(df['Details'].tolist(), index=df.index)
+    df.drop(columns=['Details'], inplace=True)
+
+    df.insert(0, 'Journal_Website', 'Springer')
+    df.insert(1, 'Journal_Name', name)
+
+    columns = ['Journal_Website', 'Journal_Name', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
+
+    process_file(output_path_solo_df, df, columns)
+    process_file(output_path_total_df, df, columns)
 
 
 def manual_scrape_springer_journals(name, volumes, issues, wait_time):

@@ -33,6 +33,7 @@ import os.path
 import sys
 import json
 from tqdm import tqdm
+import pandas as pd
 
 # Developed Modules
 from config import USER_PATH, DATA_PATH
@@ -40,6 +41,7 @@ sys.path.append(os.path.join(USER_PATH, 'src'))
 from src.oxford.web_scraper_oxford import get_papers_link_oxford, get_abstract_info_oxford, \
     get_latest_volume_number_oxford, \
     get_num_issues_oxford
+from src.helperFunctions.saving_to_dfs import process_file
 
 
 # =============================================================================
@@ -60,6 +62,8 @@ def automatic_scrape_oxford_journal(name, num_prev_vols, wait_time):
 
     base_url = f"https://academic.oup.com/{name}"
     output_path = os.path.join(DATA_PATH, f'oxford_{name}.json')
+    output_path_solo_df = os.path.join(DATA_PATH, f'oxford_df.csv')
+    output_path_total_df = os.path.join(DATA_PATH, f'all_df.csv')
     journal_url = "{}/issue/{{}}/{{}}".format(base_url)
 
     html_list = []
@@ -110,7 +114,23 @@ def automatic_scrape_oxford_journal(name, num_prev_vols, wait_time):
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
 
-    #ToDo add saving in XLSX
+    #ToDo add UNIQUE KEY
+
+    # Convert to DataFrame
+    df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])
+    df[['Title', 'Authors', 'Abstract']] = pd.DataFrame(df['Details'].tolist(), index=df.index)
+    df.drop(columns=['Details'], inplace=True)
+
+    df.insert(0, 'Journal_Website', 'Oxford')
+
+    #ToDo reformat name
+
+    df.insert(1, 'Journal_Name', name)
+
+    columns = ['Journal_Website', 'Journal_Name', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
+
+    process_file(output_path_solo_df, df, columns)
+    process_file(output_path_total_df, df, columns)
 
 def manual_scrape_oxford_journals(name, volumes, issues, wait_time):
     """

@@ -147,12 +147,15 @@ def get_abstract_info_aea(url_paper_list, paper_number, wait_time):
         volume_issue = " ".join(issue_volume_text.split(",")[0:2])
         volume_issue = _reformat_volume_issue(volume_issue)
 
+        # ToDo add UNIQUE KEY
+
         paper = [volume_issue, [title, authors, abstract]]
 
     except Exception as e:
         paper = []
 
-    browser.close()
+    finally:
+        browser.close()
     return paper
 
 

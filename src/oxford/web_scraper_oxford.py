@@ -181,6 +181,8 @@ def get_abstract_info_oxford(url_paper_list, paper_number, wait_time):
         issue = browser.find_element(By.CSS_SELECTOR, "div.volume-issue__wrap .issue").text
         issue_volume = f"{volume}, {issue}"
 
+        # ToDo add UNIQUE KEY
+
         paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []

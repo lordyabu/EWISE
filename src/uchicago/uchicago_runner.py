@@ -109,6 +109,8 @@ def automatic_scrape_uchicago_journal(name, num_prev_vols, wait_time):
         json.dump(abstract_list, json_file)
 
 
+    #ToDo add UNIQUE KEY
+
     # Convert to DataFrame
     df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])
     df[['Title', 'Authors', 'Abstract']] = pd.DataFrame(df['Details'].tolist(), index=df.index)

@@ -167,10 +167,13 @@ def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time):
         else:
             volume_issue = volume_issue_text[0] + ", Issue 1"
 
+        # ToDo add UNIQUE KEY
+
         paper = [volume_issue, [title, authors, abstract]]
 
     except Exception as e:
-        paper = []
 
-    browser.close()
+        paper = []
+    finally:
+        browser.close()
     return paper

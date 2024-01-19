@@ -106,6 +106,7 @@ def automatic_scrape_wiley_journal(name, num_prev_vols, wait_time):
     with open(output_path, 'w') as json_file:
         json.dump(abstract_list, json_file)
 
+    #ToDo add UNIQUE KEY
 
     # Convert to DataFrame
     df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])

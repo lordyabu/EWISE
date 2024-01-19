@@ -225,7 +225,9 @@ def get_abstract_info_springer(url_paper_list, paper_number, wait_time):
         volume = volume_element.text.replace("Volume", "").strip()
         issue = "X"  # Page does not show issue
 
-        paper = [f"Volume {volume}, Issue {issue}", title, authors, abstract]
+        # ToDo add UNIQUE KEY
+
+        paper = [f"Volume {volume}, Issue {issue}", [title, authors, abstract]]
     except Exception as e:
         print("Error: " + str(e))
         paper = []

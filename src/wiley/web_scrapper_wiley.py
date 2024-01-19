@@ -219,6 +219,9 @@ def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):
         authors = ", ".join([author.text for author in authors_elements])
 
         abstract = browser.find_element(By.XPATH, "//div[contains(@class, 'article-section__content')]/p").text
+
+        # ToDo add UNIQUE KEY
+
         paper = [issue_volume, [citation_title, authors, abstract]]
     except Exception as e:
         paper = []

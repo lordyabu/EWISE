@@ -155,10 +155,13 @@ def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time):
             # Fallback in case the regex doesn't find a match
             issue_volume = "Volume and issue information not found"
 
+        # ToDo add UNIQUE KEY
+
         paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []
 
-    browser.close()
+    finally:
+        browser.close()
     return paper
 
