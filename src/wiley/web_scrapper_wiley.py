@@ -45,7 +45,7 @@ import re
 import json
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from src.helperFunctions.generateKey import generate_key
 
 # =============================================================================
 # Functions
@@ -178,7 +178,7 @@ def get_papers_link_wiley(url, html_list, wait_time):
     return html_list
 
 
-def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):
+def get_abstract_info_wiley(url_paper_list, paper_number, wait_time, journal_name):
     """
     Retrieves detailed information of a specific paper from Wiley.
 
@@ -220,9 +220,9 @@ def get_abstract_info_wiley(url_paper_list, paper_number, wait_time):
 
         abstract = browser.find_element(By.XPATH, "//div[contains(@class, 'article-section__content')]/p").text
 
-        # ToDo add UNIQUE KEY
+        key = generate_key('Wiley', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
 
-        paper = [issue_volume, [citation_title, authors, abstract]]
+        paper = [key, issue_volume, [citation_title, authors, abstract]]
     except Exception as e:
         paper = []
 

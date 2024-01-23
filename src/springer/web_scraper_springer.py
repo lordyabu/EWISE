@@ -45,7 +45,7 @@ import re
 import json
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
+from src.helperFunctions.generateKey import generate_key
 
 # =============================================================================
 # Functions
@@ -187,7 +187,7 @@ def get_papers_link_springer(url, html_list, wait_time):
     return html_list
 
 
-def get_abstract_info_springer(url_paper_list, paper_number, wait_time):
+def get_abstract_info_springer(url_paper_list, paper_number, wait_time, journal_name):
     """
     Retrieves detailed information of a specific paper from Springer.
 
@@ -225,9 +225,9 @@ def get_abstract_info_springer(url_paper_list, paper_number, wait_time):
         volume = volume_element.text.replace("Volume", "").strip()
         issue = "X"  # Page does not show issue
 
-        # ToDo add UNIQUE KEY
+        key = generate_key('Springer', journal_name, volume, issue)
 
-        paper = [f"Volume {volume}, Issue {issue}", [title, authors, abstract]]
+        paper = [key, f"Volume {volume}, Issue {issue}", [title, authors, abstract]]
     except Exception as e:
         print("Error: " + str(e))
         paper = []

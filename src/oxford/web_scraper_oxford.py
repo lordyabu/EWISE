@@ -39,7 +39,7 @@ from selenium.webdriver.common.by import By
 from config import GECKO_PATH
 import re
 import json
-
+from src.helperFunctions.generateKey import generate_key
 
 # =============================================================================
 # Functions
@@ -144,7 +144,7 @@ def get_papers_link_oxford(url, html_list, wait_time):
     return html_list
 
 
-def get_abstract_info_oxford(url_paper_list, paper_number, wait_time):
+def get_abstract_info_oxford(url_paper_list, paper_number, wait_time, journal_name):
     """
     Retrieves detailed information of a specific paper from Oxford.
 
@@ -181,9 +181,10 @@ def get_abstract_info_oxford(url_paper_list, paper_number, wait_time):
         issue = browser.find_element(By.CSS_SELECTOR, "div.volume-issue__wrap .issue").text
         issue_volume = f"{volume}, {issue}"
 
-        # ToDo add UNIQUE KEY
+        key = generate_key('Oxford', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
 
-        paper = [issue_volume, [title, authors, abstract]]
+
+        paper = [key, issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []
 

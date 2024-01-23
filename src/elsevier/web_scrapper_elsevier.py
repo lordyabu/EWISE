@@ -39,6 +39,7 @@ from selenium.webdriver.common.by import By
 from config import GECKO_PATH
 import re
 import json
+from src.helperFunctions.generateKey import generate_key
 
 
 # =============================================================================
@@ -124,7 +125,7 @@ def get_papers_link_elsevier(url, html_list, wait_time):
     return html_list
 
 
-def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time):
+def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time, journal_name):
     """
     Retrieves detailed information of a specific paper from Elsevier.
 
@@ -167,9 +168,10 @@ def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time):
         else:
             volume_issue = volume_issue_text[0] + ", Issue 1"
 
-        # ToDo add UNIQUE KEY
+        key = generate_key('Elsevier', journal_name, volume_issue.split(" ")[1].replace(',', ''), volume_issue.split(" ")[-1])
 
-        paper = [volume_issue, [title, authors, abstract]]
+
+        paper = [key, volume_issue, [title, authors, abstract]]
 
     except Exception as e:
 

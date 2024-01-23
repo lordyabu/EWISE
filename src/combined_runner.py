@@ -33,16 +33,16 @@ from src.springer.springer_runner import scrape_multiple_springer_journals
 from src.wiley.wiley_runner import scrape_multiple_wiley_journals
 def main():
     run_elsevier = False
-    run_aea = False
+    run_aea = True
     run_uchicago = False
     run_oxford = False
-    run_springer = True
+    run_springer = False
     run_wiley = False
 
     num_prev_vols = 1
 
     elsevier_wait_time = 15
-    aea_wait_time = 30
+    aea_wait_time = 15
     uchicago_wait_time = 15
     oxford_wait_time = 15
     springer_wait_time = 15
@@ -79,7 +79,7 @@ def main():
     if run_aea:
         aea_journals = ['jel', 'mac', 'aeri', 'pol', 'app', 'mic', 'jep', 'aer']
 
-        aea_journals = ['jel']
+        # aea_journals = ['jel']
 
         scrape_multiple_aea_journals(journal_list=aea_journals, num_prev_vols=num_prev_vols, wait_time=aea_wait_time)
 

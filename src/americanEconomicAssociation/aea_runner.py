@@ -41,6 +41,7 @@ sys.path.append(os.path.join(USER_PATH, 'src'))
 from src.americanEconomicAssociation.web_scraper_aea import get_papers_link_aea, get_abstract_info_aea, \
     get_volume_and_issue_data_aea
 from src.helperFunctions.saving_to_dfs import process_file
+from src.helperFunctions.generateKey import generate_key
 
 
 # =============================================================================
@@ -97,9 +98,11 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
     # Get Abstracts with progress bar
     for i in tqdm(range(len(html_list)), desc="Getting abstracts"):
         try:
-            abstract = get_abstract_info_aea(url_paper_list=html_list, paper_number=i, wait_time=wait_time)
+            abstract = get_abstract_info_aea(url_paper_list=html_list, paper_number=i, wait_time=wait_time, journal_name=name)
             if abstract:
                 abstract_list.append(abstract)
+                #ToDo remove
+                break
         except Exception as e:
             pass
 
@@ -108,10 +111,9 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
         json.dump(abstract_list, json_file)
 
 
-    #ToDo add UNIQUE KEY
 
     # Convert to DataFrame
-    df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])
+    df = pd.DataFrame(abstract_list, columns=['Key', 'Volume_Issue', 'Details'])
     df[['Title', 'Authors', 'Abstract']] = pd.DataFrame(df['Details'].tolist(), index=df.index)
     df.drop(columns=['Details'], inplace=True)
 
@@ -121,7 +123,7 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
     
     df.insert(1, 'Journal_Name', name)
 
-    columns = ['Journal_Website', 'Journal_Name', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
+    columns = ['Journal_Website', 'Journal_Name', 'Key', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
 
     process_file(output_path_solo_df, df, columns)
     process_file(output_path_total_df, df, columns)

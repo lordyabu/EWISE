@@ -34,6 +34,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
 import json
+from src.helperFunctions.generateKey import generate_key
 
 # =============================================================================
 # Functions
@@ -123,7 +124,7 @@ def get_papers_link_uchicago(url, html_list, wait_time):
     return html_list
 
 
-def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time):
+def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time, journal_name):
     """
     Retrieves detailed information of a specific paper from the University of Chicago.
 
@@ -155,9 +156,10 @@ def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time):
             # Fallback in case the regex doesn't find a match
             issue_volume = "Volume and issue information not found"
 
-        # ToDo add UNIQUE KEY
+        key = generate_key('UChicago', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
 
-        paper = [issue_volume, [title, authors, abstract]]
+
+        paper = [key, issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []
 
