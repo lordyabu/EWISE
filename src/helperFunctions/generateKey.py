@@ -1,12 +1,5 @@
-def generate_key(journal_website, journal_name, volume, issue):
-    # Convert journal website and journal name to a string of ASCII values
-    website_code = ''.join(str(ord(char)) for char in journal_website)
-    name_code = ''.join(str(ord(char)) for char in journal_name)
+import pandas as pd
 
-    # Ensure fixed length for volume and issue altogether (e.g., 6 digits in total)
-    number_code = str(str(volume) + str(issue)).zfill(6)
-
-    # Concatenate the parts to form the key
-    key = website_code + name_code + number_code
-
-    return key
+def generate_key(Volume_issue, journal_name):
+    new_entry = (Volume_issue, journal_name)
+    return pd.factorize([new_entry])[0][0] + 1
