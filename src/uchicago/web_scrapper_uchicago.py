@@ -156,10 +156,9 @@ def get_abstract_info_uchicago(url_paper_list, paper_number, wait_time, journal_
             # Fallback in case the regex doesn't find a match
             issue_volume = "Volume and issue information not found"
 
-        key = generate_key('UChicago', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
-
-
-        paper = [key, issue_volume, [title, authors, abstract]]
+        # key = generate_key('UChicago', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
+        # paper = [key, issue_volume, [title, authors, abstract]]
+        paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []
 

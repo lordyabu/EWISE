@@ -181,10 +181,9 @@ def get_abstract_info_oxford(url_paper_list, paper_number, wait_time, journal_na
         issue = browser.find_element(By.CSS_SELECTOR, "div.volume-issue__wrap .issue").text
         issue_volume = f"{volume}, {issue}"
 
-        key = generate_key('Oxford', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
-
-
-        paper = [key, issue_volume, [title, authors, abstract]]
+        # key = generate_key('Oxford', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
+        # paper = [key, issue_volume, [title, authors, abstract]]
+        paper = [issue_volume, [title, authors, abstract]]
     except Exception as e:
         paper = []
 

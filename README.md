@@ -16,3 +16,6 @@ This tool is designed to fetch relevant information from academic journals and s
 - Save the extracted data in a CSV or JSON format for further analysis.
 - Customizable scraping options for different journal websites.
 - Throttle mechanism to avoid overloading journal websites with requests.
+
+
+

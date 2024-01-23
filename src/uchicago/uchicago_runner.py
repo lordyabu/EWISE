@@ -113,14 +113,16 @@ def automatic_scrape_uchicago_journal(name, num_prev_vols, wait_time):
     #ToDo add UNIQUE KEY
 
     # Convert to DataFrame
-    df = pd.DataFrame(abstract_list, columns=['Key', 'Volume_Issue', 'Details'])
+    # df = pd.DataFrame(abstract_list, columns=['Key', 'Volume_Issue', 'Details'])
+    df = pd.DataFrame(abstract_list, columns=['Volume_Issue', 'Details'])
     df[['Title', 'Authors', 'Abstract']] = pd.DataFrame(df['Details'].tolist(), index=df.index)
     df.drop(columns=['Details'], inplace=True)
 
     df.insert(0, 'Journal_Website', 'UChicago')
     df.insert(1, 'Journal_Name', get_full_name_uchicago(name))
 
-    columns = ['Journal_Website', 'Journal_Name', 'Key', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
+    # columns = ['Journal_Website', 'Journal_Name', 'Key', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
+    columns = ['Journal_Website', 'Journal_Name', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
 
 
     process_file(output_path_solo_df, df, columns)

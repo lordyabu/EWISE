@@ -220,9 +220,11 @@ def get_abstract_info_wiley(url_paper_list, paper_number, wait_time, journal_nam
 
         abstract = browser.find_element(By.XPATH, "//div[contains(@class, 'article-section__content')]/p").text
 
-        key = generate_key('Wiley', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
+        # key = generate_key('Wiley', journal_name, issue_volume.split(" ")[1].replace(',', ''), issue_volume.split(" ")[-1])
+        # paper = [key, issue_volume, [citation_title, authors, abstract]]
 
-        paper = [key, issue_volume, [citation_title, authors, abstract]]
+        paper = [issue_volume, [citation_title, authors, abstract]]
+
     except Exception as e:
         paper = []
 

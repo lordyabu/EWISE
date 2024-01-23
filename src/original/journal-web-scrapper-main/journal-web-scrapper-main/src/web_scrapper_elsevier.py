@@ -2,7 +2,7 @@
 """
 Web Scapper for Academic Journals - Elsevier Module
 
-This project provides a web scraping tool to extract data from academic 
+This project provides a web scraping tool to extract data from academic
 journals, including article titles, authors, abstracts, and other details.
 It uses the Python programming language and the Selenium library, 
 along with the Firefox web driver, to automate the process of accessing 

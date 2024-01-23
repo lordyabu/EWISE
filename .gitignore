@@ -1,9 +1,11 @@
 geckodriver.exe
 geckodriver.log
 src/explore_data
-data
+data_old
+data_old_2
 chromedriver.exe
 config.py
+data
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

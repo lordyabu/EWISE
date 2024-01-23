@@ -168,10 +168,9 @@ def get_abstract_info_elsevier(url_paper_list, paper_number, wait_time, journal_
         else:
             volume_issue = volume_issue_text[0] + ", Issue 1"
 
-        key = generate_key('Elsevier', journal_name, volume_issue.split(" ")[1].replace(',', ''), volume_issue.split(" ")[-1])
-
-
-        paper = [key, volume_issue, [title, authors, abstract]]
+        # key = generate_key('Elsevier', journal_name, volume_issue.split(" ")[1].replace(',', ''), volume_issue.split(" ")[-1])
+        # paper = [key, volume_issue, [title, authors, abstract]]
+        paper = [volume_issue, [title, authors, abstract]]
 
     except Exception as e:
 

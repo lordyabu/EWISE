@@ -225,9 +225,9 @@ def get_abstract_info_springer(url_paper_list, paper_number, wait_time, journal_
         volume = volume_element.text.replace("Volume", "").strip()
         issue = "X"  # Page does not show issue
 
-        key = generate_key('Springer', journal_name, volume, issue)
-
-        paper = [key, f"Volume {volume}, Issue {issue}", [title, authors, abstract]]
+        # key = generate_key('Springer', journal_name, volume, issue)
+        # paper = [key, f"Volume {volume}, Issue {issue}", [title, authors, abstract]]
+        paper = [f"Volume {volume}, Issue {issue}", [title, authors, abstract]]
     except Exception as e:
         print("Error: " + str(e))
         paper = []

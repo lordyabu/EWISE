@@ -147,9 +147,9 @@ def get_abstract_info_aea(url_paper_list, paper_number, wait_time, journal_name)
         volume_issue = " ".join(issue_volume_text.split(",")[0:2])
         volume_issue = _reformat_volume_issue(volume_issue)
 
-        key = generate_key('AEA', journal_name, volume_issue.split(" ")[1].replace(',', ''), volume_issue.split(" ")[-1])
-
-        paper = [key, volume_issue, [title, authors, abstract]]
+        # key = generate_key('AEA', journal_name, volume_issue.split(" ")[1].replace(',', ''), volume_issue.split(" ")[-1])
+        # paper = [key, volume_issue, [title, authors, abstract]]
+        paper = [volume_issue, [title, authors, abstract]]
 
     except Exception as e:
         paper = []

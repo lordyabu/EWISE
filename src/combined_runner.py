@@ -32,12 +32,12 @@ from src.oxford.oxford_runner import scrape_multiple_oxford_journals
 from src.springer.springer_runner import scrape_multiple_springer_journals
 from src.wiley.wiley_runner import scrape_multiple_wiley_journals
 def main():
-    run_elsevier = False
+    run_elsevier = True
     run_aea = True
-    run_uchicago = False
-    run_oxford = False
-    run_springer = False
-    run_wiley = False
+    run_uchicago = True
+    run_oxford = True
+    run_springer = True
+    run_wiley = True
 
     num_prev_vols = 1
 
@@ -95,7 +95,7 @@ def main():
         oxford_journals = ["restud", "rfs", "jeea", "wber", "jleo", "rof", "jcr", "ectj", "joeg", "rcfs", "oep", "jfec",
                         "raps"]
 
-        oxford_journals = ['restud']
+        # oxford_journals = ['restud']
 
         scrape_multiple_oxford_journals(journal_list=oxford_journals, num_prev_vols=num_prev_vols, wait_time=oxford_wait_time)
 
@@ -104,7 +104,7 @@ def main():
         springer_journals = ['IMF Economic Review', 'Journal of Economic Growth', 'Journal of Risk and Uncertainty',
                         'Journal of Population Economics', 'Economic Theory', 'Public Choice', 'Empirical Economics']
 
-        springer_journals = ['IMF Economic Review']
+        # springer_journals = ['IMF Economic Review']
 
         scrape_multiple_springer_journals(journal_list=springer_journals, num_prev_vols=num_prev_vols, wait_time=springer_wait_time)
 
