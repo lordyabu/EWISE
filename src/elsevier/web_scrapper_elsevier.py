@@ -47,6 +47,15 @@ from src.helperFunctions.generateKey import generate_key
 # =============================================================================
 
 
+def convert_elsevier_name(journal):
+    new = ""
+    for i in journal.split("-"):
+        if i == "of" or i == "and" or i == "to":
+            new = new + i + " "
+        else:
+            new = new + i.capitalize() + " "
+    return new
+
 def get_num_issues_elsevier(name):
     """
     Retrieves the number of issues available for a specified Elsevier journal.

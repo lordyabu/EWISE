@@ -39,7 +39,7 @@ from tqdm import tqdm
 from config import USER_PATH, DATA_PATH
 sys.path.append(os.path.join(USER_PATH, 'src'))
 from src.elsevier.web_scrapper_elsevier import get_papers_link_elsevier, get_abstract_info_elsevier, \
-    get_num_issues_elsevier, get_latest_volume_elsevier
+    get_num_issues_elsevier, get_latest_volume_elsevier, convert_elsevier_name
 from src.helperFunctions.saving_to_dfs import process_file
 
 # =============================================================================
@@ -104,7 +104,8 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
             if abstract:
                 abstract_list.append(abstract)
                 #ToDo remove
-                break
+                if len(abstract_list) > 10:
+                    break
 
         except Exception as e:
             pass
@@ -125,7 +126,7 @@ def automatic_scrape_elsevier_journal(name, num_prev_vols, wait_time):
 
     #ToDo reformat name
 
-    df.insert(1, 'Journal_Name', name)
+    df.insert(1, 'Journal_Name', convert_elsevier_name(name))
 
     # columns = ['Journal_Website', 'Journal_Name', 'Key', 'Volume_Issue', 'Title', 'Authors', 'Abstract']
     columns = ['Journal_Website', 'Journal_Name', 'Volume_Issue', 'Title', 'Authors', 'Abstract']

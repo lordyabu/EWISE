@@ -3,6 +3,7 @@ geckodriver.log
 src/explore_data
 data_old
 data_old_2
+data_old_3
 chromedriver.exe
 config.py
 data

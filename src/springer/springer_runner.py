@@ -89,7 +89,8 @@ def automatic_scrape_springer_journal(name, num_prev_vols, wait_time):
             if abstract:
                 abstract_list.append(abstract)
                 #ToDo remove
-                break
+                if len(abstract_list) > 10:
+                    break
         except Exception as e:
             pass
 
