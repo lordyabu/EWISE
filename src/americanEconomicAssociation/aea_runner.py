@@ -101,9 +101,6 @@ def automatic_scrape_aea_journal(name, num_prev_vols, wait_time):
             abstract = get_abstract_info_aea(url_paper_list=html_list, paper_number=i, wait_time=wait_time, journal_name=name)
             if abstract:
                 abstract_list.append(abstract)
-                #ToDo remove
-                if len(abstract_list) > 10:
-                    break
         except Exception as e:
             pass
 
