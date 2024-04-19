@@ -3,6 +3,7 @@ Using mostly Andrej Karpathy's code for generation: https://github.com/karpathy/
 I simply preprocessed the data (Combined into txt file and added Start and End tokens) and messed around with some hyper parameters.
 
 
+```code
 Generated with 3000 tokens:
 <start> venture in networks can lead to higher CO2 reduction caused by the tax avoidance to CO2 from countries with high-tax recovery. Predictors are explicitly distributed that policy can improve the operation of CO2 emissions from policy and green taxes. To farmers' and outmodell roles. In this paper, we first document two components can generate and then condition that tradable agricultural production can be manifested at its curtailment level and the environmental data potential fit consistent with partisans. Nested further work can optimize trade swaps between 30,000 and 2010, and the state of Denmark. <end>
 
@@ -13,3 +14,4 @@ Generated with 3000 tokens:
 <start> Global financial economies have negative impacts on the factors that persist unrealistically. Governments are a rationale for formulating one of the receiving green guidelines. A prominent finding suggests that it possesses free rates, especially in terms of emissions, policymakers, and globally-balanced policies that do not use machinery as green, awards of government and diversified carbon pricing and operating (CO2-bilateral). <end>
 
 <start>  The call value of various academic services (SVISS) can provide interest in very clear episodes.  Representative budget-based estimates are proposed.  Yet bilateral trade-based, cooling and legal actors/self-protection can have close to sites when reducing cook to grow. Abstract This paper uses a model, combined with measurement of variety regressions, broadly focused on parametric estimates of the cooking trade-based evidence in which recent research has shown the Zaldor-city factor to migrate. The paper examined which the identification and frequencies analytical regressions co
+```
