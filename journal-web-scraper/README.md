@@ -31,7 +31,7 @@ This tool currently supports a range of prestigious economic journals, including
 
 ## Getting Started
 
-To run the tool, navigate to the `src/combined_runner` directory. Modify your preferences in the `main` function and execute the script to start scraping the desired academic journals.
+To run the tool, navigate to the `src/combined_runner.py` directory. Modify your preferences in the `main` function and execute the script (src/combined_runner.py) to start scraping the desired academic journals.
 
 ## Adding Support for New Journals
 
