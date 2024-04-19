@@ -6,5 +6,4 @@ See directories for more detailed READMEs
 [Suggestion](/journal-suggestion)
 
 
-
 [Generation](/journal-generation)
