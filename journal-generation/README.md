@@ -2,6 +2,8 @@ Using mostly Andrej Karpathy's code for generation: https://github.com/karpathy/
 
 I simply preprocessed the data (Combined into txt file and added Start and End tokens) and messed around with some hyper parameters.
 
+Much room for improvement.
+
 
 ```code
 Generated with 3000 tokens:
